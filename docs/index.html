@@ -1,0 +1,2195 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="data:,">
+<title>Common Sky</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root {
+  /* Layout: a dashboard of the planet across the top (round, thermometer, sinks, tipping points), the summit and crises beneath it, then your bloc's board and hand, with the other blocs beside it. */
+  --night: #11182e;
+  --night-2: #18213d;
+  --night-3: #222d50;
+  --line: rgba(173, 190, 255, .2);
+  --text: #eef1fb;
+  --muted: #a9b2d4;
+  --dawn: #ff9f6b;
+  --sun: #ffd27a;
+  --sky: #74b9ff;
+  --leaf: #6fcf7f;
+  --smog: #8b90a0;
+  --heat: #ff6b6b;
+  --paper: #f8f5ee;
+  --ink: #1f2433;
+  --f-display: "Sora", "Avenir Next", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body { margin: 0; background: linear-gradient(180deg, #2a2350 0%, var(--night) 32%) fixed, var(--night); color: var(--text); font: 15px/1.45 var(--f-body); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 14px 48px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+.eyebrow, .label, label { display: block; font: 700 11px/1.2 var(--f-body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.note { font-size: 13px; color: var(--muted); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+.brand { font: 700 24px/1 var(--f-display); letter-spacing: .02em; background: linear-gradient(90deg, var(--sun), var(--dawn)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.top-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.chip { font: 700 12px/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+.chip.warn { color: var(--heat); border-color: var(--heat); }
+.chip.good { color: var(--leaf); border-color: var(--leaf); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 700 14px/1.1 var(--f-body); padding: 10px 15px; border-radius: 10px; border: 1px solid #e0874f; background: linear-gradient(180deg, #ffb685, #ff9156); color: #2b1306; cursor: pointer; box-shadow: 0 2px 0 #b65a2a; transition: transform .1s ease, filter .1s ease; }
+.btn:hover { filter: brightness(1.05); }
+.btn:active { transform: translateY(1px); box-shadow: none; }
+.btn.ghost { background: transparent; color: var(--text); border-color: var(--line); box-shadow: none; }
+.btn.ghost:hover { border-color: var(--dawn); }
+.btn.small { padding: 6px 10px; font-size: 13px; }
+.btn.green { background: linear-gradient(180deg, #8fe39d, #5cc26d); border-color: #3e9a4f; color: #0d2a14; box-shadow: 0 2px 0 #2f7a3d; }
+.btn:disabled { opacity: .4; cursor: not-allowed; filter: none; }
+.btn:focus-visible, select:focus-visible, input:focus-visible, .card:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+select, input[type=text] { font: 15px var(--f-body); color: var(--text); background: var(--night); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; width: 100%; min-width: 0; }
+.field { display: grid; gap: 5px; }
+.check { display: flex; gap: 9px; align-items: center; text-transform: none; letter-spacing: 0; font: 700 14px var(--f-body); color: var(--text); cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--dawn); }
+.row { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+.row > .field { flex: 1 1 120px; }
+.panel { padding: 16px; border-radius: 16px; border: 1px solid var(--line); background: rgba(10, 14, 32, .45); display: grid; gap: 10px; align-content: start; min-width: 0; }
+.panel h2 { font-size: 20px; color: var(--sun); }
+.panel h3 { font-size: 16px; color: var(--sun); }
+.dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; }
+
+/* Cards */
+.card { position: relative; width: 168px; flex: none; padding: 9px 10px 10px; border-radius: 12px; background: var(--paper); color: var(--ink); border: 1px solid #ddd5c4; box-shadow: 0 2px 0 #cbbfa6, 0 8px 16px rgba(0,0,0,.3); display: grid; gap: 6px; align-content: start; text-align: left; }
+button.card { cursor: pointer; transition: transform .14s ease, box-shadow .14s ease; }
+button.card:hover { transform: translateY(-3px); }
+.card.sel { box-shadow: 0 0 0 3px var(--dawn), 0 10px 20px rgba(0,0,0,.35); transform: translateY(-6px); }
+.card.pay { box-shadow: 0 0 0 3px var(--heat), 0 10px 20px rgba(0,0,0,.35); }
+.card .ct { font: 600 13px/1.2 var(--f-display); padding-right: 2px; }
+.card .ca { font-size: 12.5px; line-height: 1.35; }
+.card .cl { font: 700 10px/1.2 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: #7a7466; }
+.card .cbloc { font: 700 10px var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: #8a6d3b; }
+.tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.tg { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 99px; font: 700 11px/1.3 var(--f-body); color: #13182a; }
+.strip { width: 168px; padding: 5px 10px; border-radius: 10px 10px 0 0; background: #e9e3d6; color: var(--ink); border: 1px solid #d6cdb9; border-bottom: 0; display: flex; justify-content: space-between; gap: 6px; align-items: center; margin-bottom: -4px; }
+.strip .ct { font: 600 11px/1.2 var(--f-display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.stack { display: grid; align-content: end; }
+.stack-foot { display: grid; gap: 6px; margin-top: 8px; width: 168px; }
+.amt { font: 700 13px var(--f-body); color: var(--leaf); }
+.stacks { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.hand { display: flex; gap: 10px; flex-wrap: wrap; }
+.choices { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Dashboard */
+.dash { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
+.rounds { display: flex; gap: 6px; }
+.rounds span { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 700 13px var(--f-display); border: 2px solid var(--line); color: var(--muted); }
+.rounds span.now { border-color: var(--dawn); color: var(--text); background: rgba(255,159,107,.15); }
+.rounds span.past { background: var(--night-3); }
+.thermo { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.thermo i { height: 22px; border-radius: 5px; background: var(--night-3); border: 1px solid var(--line); position: relative; overflow: hidden; }
+.thermo i.on { border-color: transparent; }
+.thermo i span { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, #ffb26b, #ff6b6b); }
+.big { font: 700 28px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.outlook { display: flex; gap: 14px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.outlook div { display: grid; gap: 2px; }
+.outlook b { font: 700 20px var(--f-display); }
+.planet { display: grid; gap: 4px; }
+.prow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 12.5px; }
+.pcells { display: flex; gap: 3px; }
+.pcells i { width: 15px; height: 15px; border-radius: 4px; background: var(--night-3); border: 1px solid var(--line); }
+.pcells i.tip { border-color: var(--heat); }
+.pcells i.on { background: var(--dawn); border-color: var(--dawn); }
+.pcells i.tip.on { background: var(--heat); }
+.mid { margin-bottom: 12px; }
+.stagebar { padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,210,122,.08); color: var(--sun); font-weight: 700; }
+.ccard { padding: 10px 12px; border-radius: 12px; background: #3a1f2a; border: 1px solid #7d3b4c; display: grid; gap: 5px; }
+.ccard h4 { margin: 0; font: 600 15px var(--f-display); color: #ffd0d0; }
+.ccard.unknown { background: repeating-linear-gradient(135deg, #2a2038 0 8px, #241c31 8px 16px); border-color: var(--line); }
+.ccards { display: flex; gap: 8px; flex-wrap: wrap; }
+.ccards > * { flex: 1 1 200px; }
+.gcard { padding: 10px 12px; border-radius: 12px; background: #1d3044; border: 1px solid #355a7c; display: grid; gap: 5px; }
+.gcard.active { background: #173d2a; border-color: #3e9a5f; }
+.gcard h4 { margin: 0; font: 600 14px var(--f-display); color: #d8ecff; }
+.gcard.active h4 { color: #c8f7d4; }
+.bar { height: 7px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--sky); }
+.gcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+
+/* Bloc board */
+.game { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; align-items: start; }
+.board { display: grid; gap: 12px; min-width: 0; }
+.bloc { padding: 16px; border-radius: 16px; border: 1px solid var(--line); background: rgba(10, 14, 32, .5); display: grid; gap: 14px; min-width: 0; }
+.bloc.mine { border-color: var(--dawn); }
+.bloc-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bloc-head h2 { font-size: 22px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.stat { padding: 10px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid var(--line); display: grid; gap: 6px; min-width: 0; }
+.energy { display: flex; height: 16px; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,.08); position: relative; }
+.energy .d { background: var(--smog); }
+.energy .c { background: var(--leaf); }
+.energy .m { position: absolute; top: -3px; bottom: -3px; width: 3px; background: var(--sun); }
+.kv { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.kv b { font-weight: 700; }
+.cic { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; }
+.cic i { height: 12px; border-radius: 3px; background: rgba(255,255,255,.1); }
+.cic i.on { background: var(--heat); }
+.cic i.th { box-shadow: inset 0 -2px 0 var(--sun); }
+.warn-text { color: var(--heat); font-weight: 700; }
+.others { display: grid; gap: 10px; }
+.other { padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(10,14,32,.45); display: grid; gap: 6px; font-size: 13px; }
+.other h3 { font-size: 15px; display: flex; gap: 8px; align-items: center; }
+.chron { padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(10,14,32,.45); max-height: 340px; overflow: auto; }
+.chron h3 { font-size: 15px; color: var(--sun); }
+.chron ol { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 7px; font-size: 13px; }
+.chron li { padding-bottom: 7px; border-bottom: 1px solid var(--line); color: var(--muted); }
+.chron li:first-child { color: var(--text); }
+.k-crisis, .k-heat, .k-lose { color: #ffb3b3 !important; }
+.k-saved, .k-win, .k-global { color: #b8f0c4 !important; }
+.k-planet { color: var(--sun) !important; }
+.prompt { padding: 12px 14px; border-radius: 12px; background: var(--paper); color: var(--ink); font-weight: 700; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.prompt .btn.ghost { color: var(--ink); border-color: rgba(31,36,51,.3); }
+.report { display: grid; gap: 8px; }
+.report ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.coach { background: var(--paper); color: var(--ink); border-radius: 10px; padding: 10px 14px; box-shadow: 0 6px 16px rgba(0,0,0,.3); }
+.coach .eyebrow { color: #6d6658; }
+.chart { width: 100%; max-width: 520px; height: auto; }
+
+/* Home */
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; align-items: center; padding-block: 8px 24px; }
+.hero h1 { font-size: clamp(48px, 7vw, 92px); line-height: .95; background: linear-gradient(90deg, var(--sun), var(--dawn) 60%, #ff7a8a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lede { font-size: 18px; max-width: 34em; margin-top: 14px; }
+.lede + .lede { font-size: 15px; color: var(--muted); margin-top: 8px; }
+.namebar { margin-bottom: 12px; }
+.namebar .field { width: min(320px, 100%); }
+.modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.mode { display: grid; gap: 10px; align-content: start; padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(10,14,32,.45); min-width: 0; }
+.mode h2 { font-size: 22px; color: var(--sun); }
+.mode > p { color: var(--muted); }
+.mode .btn { justify-self: start; }
+.hs-list { display: grid; gap: 6px; }
+.hs-item { display: flex; gap: 6px; }
+.resume { display: flex; gap: 6px; flex-wrap: wrap; }
+.primer { margin-top: 26px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; }
+.primer h2 { font-size: 22px; color: var(--sun); }
+.steps { list-style: none; counter-reset: s; padding: 0; margin: 12px 0 0; display: grid; gap: 10px; max-width: 66ch; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; }
+.steps li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font: 700 13px/1 var(--f-display); color: var(--ink); background: var(--sun); }
+.lobby { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 14px; }
+.code { font: 700 52px/1 var(--f-display); letter-spacing: .14em; color: var(--sun); overflow-wrap: anywhere; }
+.seats { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.seats li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+.tag { font: 700 11px var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.overlay { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(8,10,24,.9); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: calc(16px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.sheet { width: min(800px, 100%); max-height: 100%; overflow: auto; padding: 24px; border-radius: 16px; background: var(--night-2); border: 1px solid var(--dawn); box-shadow: 0 20px 50px rgba(0,0,0,.5); display: grid; gap: 12px; }
+.sheet h2 { font-size: 28px; color: var(--sun); }
+.sheet h3 { font-size: 17px; color: var(--sun); margin-top: 6px; }
+.sheet ul, .sheet ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+.sheet .close { justify-self: end; }
+.cover-card { width: min(460px, 100%); text-align: center; justify-items: center; }
+.cover-card h2 { font-size: 34px; }
+#toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--paper); color: var(--ink); padding: 10px 16px; border-radius: 10px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,.45); transition: opacity .2s, transform .2s; z-index: 60; width: max-content; max-width: min(92vw, 520px); text-align: center; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+#toast.bad { background: var(--heat); color: #2a0808; }
+@media (max-width: 1100px) { .dash { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 960px) {
+  .game, .mid, .hero, .primer { grid-template-columns: minmax(0, 1fr); }
+  .modes { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) { .lobby { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .dash { grid-template-columns: minmax(0, 1fr); }
+  .card, .strip, .stack-foot { width: 150px; }
+  .stats { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Common Sky</div>
+    <div class="top-right" id="topRight"></div>
+  </header>
+  <main id="screen"></main>
+</div>
+<div id="cover" class="overlay" hidden></div>
+<div id="rules" class="overlay" hidden></div>
+<div id="toast" role="status"></div>
+<script>
+(function () {
+'use strict';
+const TAGS = {
+  grid: ['Grid', '#4aa3df'], solar: ['Solar', '#f2b233'], wind: ['Wind', '#62c7b8'], hydro: ['Hydro', '#3f7fd6'],
+  community: ['Community', '#e57fa8'], nature: ['Nature', '#5fb36b'], build: ['Build', '#b08a5c'],
+  policy: ['Policy', '#b66bdb'], finance: ['Finance', '#d8b84a'], research: ['Research', '#8f9bff'], geo: ['Geo', '#9aa0a6']
+};
+const EMIS = ['transport', 'industry', 'buildings', 'agriculture', 'fuel', 'waste'];
+const EMI_NAME = { transport: 'Transport', industry: 'Industry', buildings: 'Buildings', agriculture: 'Agriculture', fuel: 'Fuel Extraction', waste: 'Waste' };
+const RES = ['social', 'eco', 'infra'];
+const RES_NAME = { social: 'Social', eco: 'Ecological', infra: 'Infrastructure', any: 'any' };
+const ACT = {
+  clean: { cost: 1, once: false }, cleanfree: { cost: 0, once: true }, phase: { cost: 0, once: true }, cut: { cost: 0, once: true },
+  elec: { cost: 0, once: true }, res: { cost: 0, once: true }, draw: { cost: 1, once: true }, tree: { cost: 1, once: true },
+  ocean: { cost: 1, once: true }, dac: { cost: 2, once: true }, eff: { cost: 0, once: true }, aid: { cost: 0, once: true, multi: true },
+  aidres: { cost: 0, once: true, multi: true }, relief: { cost: 1, once: true }, geo: { cost: 0, once: true }
+};
+const CARD_DEFS = [
+  ['Rooftop Solar Co-ops', 'solar,community', 'clean:solar'],
+  ['Utility Solar Parks', 'solar,grid', 'clean:solar'],
+  ['Offshore Wind Farms', 'wind,grid', 'clean:wind'],
+  ['Community Wind', 'wind,community', 'clean:wind'],
+  ['Smart Grid Upgrade', 'grid,research', 'clean:grid'],
+  ['Long-Distance Transmission', 'grid,build', 'clean:grid'],
+  ['Run-of-River Hydro', 'hydro,nature', 'clean:hydro'],
+  ['Pumped Storage', 'hydro,grid', 'cleanfree:hydro'],
+  ['Grid Batteries', 'grid,research', 'cleanfree:grid'],
+  ['Agrivoltaics', 'solar,nature', 'cleanfree:solar'],
+  ['Floating Solar', 'solar,hydro', 'clean:solar'],
+  ['Repowered Wind Sites', 'wind,finance', 'cleanfree:wind'],
+  ['Geothermal Plants', 'research,build', 'clean:research'],
+  ['Green Hydrogen', 'research,wind', 'cut:industry:research'],
+  ['Microgrids', 'grid,community', 'res:infra:grid'],
+  ['Coal Plant Retirement', 'policy,grid', 'phase:policy'],
+  ['Clean Power Standard', 'policy,solar', 'phase:policy'],
+  ['Carbon Price', 'policy,finance', 'phase:finance'],
+  ['Fossil Subsidy Reform', 'finance,policy', 'phase:finance'],
+  ['Just Transition Fund', 'finance,community', 'phase:community'],
+  ['Gas Plant Phaseout', 'policy,wind', 'phase:wind'],
+  ['Methane Leak Rules', 'policy', 'cut:fuel:policy'],
+  ['Well Plugging Programme', 'build,nature', 'cut:fuel:build'],
+  ['No New Drilling', 'policy,nature', 'cut:fuel:nature'],
+  ['Electric Bus Fleets', 'grid,community', 'elec:transport:grid'],
+  ['EV Incentives', 'finance,grid', 'elec:transport:finance'],
+  ['High-Speed Rail', 'build,grid', 'cut:transport:build'],
+  ['Cycle Networks', 'build,community', 'cut:transport:community'],
+  ['Fifteen-Minute Cities', 'community,policy', 'cut:transport:policy'],
+  ['Clean Shipping Corridors', 'hydro,policy', 'cut:transport:hydro'],
+  ['Sustainable Aviation Fuel', 'research,finance', 'cut:transport:research'],
+  ['Freight Electrification', 'grid,build', 'elec:transport:build'],
+  ['Green Steel', 'research,build', 'cut:industry:build'],
+  ['Low-Carbon Cement', 'research,policy', 'cut:industry:research'],
+  ['Industrial Heat Pumps', 'grid,research', 'elec:industry:grid'],
+  ['Circular Manufacturing', 'policy,research', 'cut:industry:policy'],
+  ['Carbon Border Tariff', 'policy,finance', 'cut:industry:finance'],
+  ['Industrial Efficiency Audits', 'policy,build', 'eff:policy'],
+  ['Heat Pump Rebates', 'finance,grid', 'elec:buildings:finance'],
+  ['Deep Retrofits', 'build,community', 'cut:buildings:build'],
+  ['Passive House Codes', 'policy,build', 'cut:buildings:policy'],
+  ['District Heating', 'build,grid', 'elec:buildings:build'],
+  ['Efficient Appliances', 'policy,research', 'eff:research'],
+  ['Cool Roofs', 'build,solar', 'eff:build'],
+  ['LED Streetlights', 'grid,build', 'eff:grid'],
+  ['Regenerative Farming', 'nature,community', 'cut:agriculture:nature'],
+  ['Plant-Rich Diets', 'community,nature', 'cut:agriculture:community'],
+  ['Methane-Reducing Feed', 'research,nature', 'cut:agriculture:research'],
+  ['Paddy Water Management', 'hydro,nature', 'cut:agriculture:hydro'],
+  ['Food Waste Reduction', 'community,policy', 'cut:waste:community'],
+  ['Landfill Gas Capture', 'build,research', 'cut:waste:build'],
+  ['Composting Programmes', 'community,nature', 'cut:waste:nature'],
+  ['Recycling Standards', 'policy,build', 'cut:waste:policy'],
+  ['Reforestation', 'nature,community', 'tree:nature'],
+  ['Urban Forests', 'nature,build', 'tree:nature'],
+  ['Peatland Restoration', 'nature,hydro', 'tree:nature'],
+  ['Mangrove Restoration', 'nature,hydro', 'ocean:nature'],
+  ['Seagrass Meadows', 'nature,research', 'ocean:nature'],
+  ['Kelp Forests', 'hydro,research', 'ocean:hydro'],
+  ['Protected Areas', 'nature,policy', 'tree:policy'],
+  ['Indigenous Land Rights', 'community,nature', 'tree:community'],
+  ['Soil Carbon Farming', 'nature,finance', 'tree:finance'],
+  ['Marine Reserves', 'policy,hydro', 'ocean:policy'],
+  ['Direct Air Capture', 'geo,research', 'dac:geo'],
+  ['Enhanced Weathering', 'geo,nature', 'dac:geo'],
+  ['Biochar', 'geo,nature', 'dac:geo'],
+  ['Ocean Alkalinity Trials', 'geo,hydro', 'geo:geo'],
+  ['Cloud Brightening Study', 'geo,research', 'geo:geo'],
+  ['Bioenergy With Capture', 'geo,build', 'dac:build'],
+  ['Resilience Volunteers', 'community', 'res:social:community'],
+  ['Citizen Assemblies', 'community,policy', 'res:social:community'],
+  ['Public Health Systems', 'community,finance', 'res:social:finance'],
+  ['Early Warning Systems', 'research,build', 'res:infra:research'],
+  ['Flood Defences', 'build,hydro', 'res:infra:build'],
+  ['Climate-Proof Infrastructure', 'build,finance', 'res:infra:build'],
+  ['Wetland Buffers', 'nature,hydro', 'res:eco:nature'],
+  ['Seed Banks', 'nature,research', 'res:eco:research'],
+  ['Wildlife Corridors', 'nature,policy', 'res:eco:nature'],
+  ['Drought-Resistant Crops', 'research,nature', 'res:eco:research'],
+  ['Disaster Insurance Pools', 'finance,community', 'res:any:finance'],
+  ['Climate Education', 'community,research', 'res:social:research'],
+  ['Technology Transfer', 'research,finance', 'aid:research'],
+  ['Clean Energy Exports', 'solar,finance', 'aid:solar'],
+  ['Adaptation Finance', 'finance,community', 'aidres:finance'],
+  ['Loss And Damage Fund', 'finance,policy', 'relief:finance'],
+  ['Community Health Workers', 'community,nature', 'relief:community'],
+  ['Housing Guarantee', 'build,community', 'relief:build'],
+  ['Climate Research Network', 'research', 'draw:research'],
+  ['Green Investment Bank', 'finance,grid', 'draw:finance'],
+  ['Policy Labs', 'policy,research', 'draw:policy'],
+  ['Open Climate Data', 'research,community', 'draw:research'],
+  ['Mission-Driven Innovation', 'research,grid', 'cleanfree:research'],
+  ['Public Transport Funding', 'finance,build', 'cut:transport:finance'],
+  ['Behaviour Change Campaigns', 'community,policy', 'eff:community'],
+  ['Demand Response', 'grid,community', 'eff:grid'],
+  ['Tidal Power', 'hydro,research', 'clean:hydro']
+];
+const BLOCS = {
+  atlantic: { name: 'Atlantic Union', colour: '#5aa9e6', demand: 11, growth: 1, dirty: 7, clean: 4, emis: { transport: 3, industry: 3, buildings: 3, agriculture: 1, fuel: 0, waste: 1 }, res: { social: 2, eco: 1, infra: 2 }, cic: 0,
+    start: [['Offshore Wind Programme', 'wind,grid', 'clean:wind'], ['Emissions Trading', 'policy,finance', 'phase:policy'], ['Rail Renaissance', 'build,grid', 'cut:transport:build'], ['Social Safety Net', 'community,finance', 'res:social:community'], ['Green Deal Industry', 'research,finance', 'cut:industry:research']] },
+  northern: { name: 'Northern Republic', colour: '#ef6f6c', demand: 16, growth: 1, dirty: 12, clean: 4, emis: { transport: 5, industry: 3, buildings: 3, agriculture: 1, fuel: 3, waste: 1 }, res: { social: 1, eco: 1, infra: 2 }, cic: 0,
+    start: [['Solar Belt', 'solar,grid', 'clean:solar'], ['Infrastructure Act', 'build,finance', 'res:infra:build'], ['EV Manufacturing', 'grid,research', 'elec:transport:grid'], ['Clean Electricity Credits', 'finance,policy', 'phase:finance'], ['Innovation Labs', 'research', 'draw:research']] },
+  eastern: { name: 'Eastern Commonwealth', colour: '#f2b233', demand: 13, growth: 2, dirty: 10, clean: 3, emis: { transport: 3, industry: 8, buildings: 3, agriculture: 1, fuel: 0, waste: 1 }, res: { social: 1, eco: 1, infra: 1 }, cic: 1,
+    start: [['Mega Solar Bases', 'solar,grid', 'clean:solar'], ['Coal Retirement Quotas', 'policy,grid', 'phase:policy'], ['Industrial Upgrade', 'research,build', 'cut:industry:build'], ['Sponge Cities', 'build,nature', 'res:infra:build'], ['Green Tech Push', 'solar,research', 'cleanfree:solar']] },
+  southern: { name: 'Southern Alliance', colour: '#6fcf7f', demand: 9, growth: 3, dirty: 7, clean: 2, emis: { transport: 1, industry: 3, buildings: 1, agriculture: 4, fuel: 1, waste: 1 }, res: { social: 1, eco: 1, infra: 0 }, cic: 2,
+    start: [['Village Solar Minigrids', 'solar,community', 'cleanfree:solar'], ['Agroforestry', 'nature,community', 'tree:nature'], ['Community Resilience Hubs', 'community,build', 'res:social:community'], ['Climate Finance Access', 'finance,policy', 'relief:finance'], ['Clean Cooking', 'community,nature', 'cut:agriculture:community']] }
+};
+const BLOC_SETS = { 1: ['atlantic'], 2: ['eastern', 'northern'], 3: ['southern', 'atlantic', 'northern'], 4: ['southern', 'eastern', 'atlantic', 'northern'] };
+const SINKS = { 1: [6, 4], 2: [16, 10], 3: [13, 9], 4: [20, 12] };
+const DIFFS = { easier: { label: 'Easier', mul: 1.25 }, standard: { label: 'Standard', mul: 1 }, harder: { label: 'Harder', mul: 0.85 } };
+const SOLO_START = { demand: 13, dirty: 10, clean: 3, emis: { transport: 3, industry: 4, buildings: 2, agriculture: 2, fuel: 2, waste: 1 }, growth: 2 };
+const GLOBAL_DEFS = [
+  ['Paris Rulebook', 'policy', 'emit1', 'Each bloc emits 1 less Carbon every round.'],
+  ['Global Methane Pledge', 'policy', 'fuel1', 'Every round, each bloc removes 1 Fuel Extraction emission.'],
+  ['Green Climate Fund', 'finance', 'draw1', 'Each bloc draws 1 extra card every round.'],
+  ['Mission Innovation', 'research', 'clean1', 'Each bloc gains 1 Clean Energy every round.'],
+  ['Great Green Wall', 'nature', 'trees', 'Add 2 Trees per bloc when this activates.'],
+  ['High Seas Treaty', 'hydro', 'oceans', 'Add 2 Oceans per bloc when this activates.'],
+  ['Global Adaptation Goal', 'community', 'shield', 'Every Crisis effect is reduced by 1 for each bloc.'],
+  ['Super Grid Alliance', 'grid', 'demand', 'Energy Demand grows 1 less each round.'],
+  ['International Solar Alliance', 'solar', 'clean1', 'Each bloc gains 1 Clean Energy every round.'],
+  ['Wind Power Pact', 'wind', 'emit1', 'Each bloc emits 1 less Carbon every round.'],
+  ['Carbon Removal Purchase Pact', 'geo', 'dac', 'Add 2 Direct Air Capture per bloc when this activates.'],
+  ['Loss And Damage Facility', 'finance', 'relief', 'Every round, each bloc removes 1 Community in Crisis.'],
+  ['Building Standards Accord', 'build', 'build1', 'Every round, each bloc removes 1 Buildings emission.'],
+  ['Clean Transport Accord', 'grid', 'trans1', 'Every round, each bloc removes 1 Transport emission.'],
+  ['Food Systems Pact', 'nature', 'agri1', 'Every round, each bloc removes 1 Agriculture emission.'],
+  ['Zero Waste Charter', 'community', 'waste1', 'Every round, each bloc removes 1 Waste emission.'],
+  ['Steel And Cement Club', 'research', 'ind1', 'Every round, each bloc removes 1 Industry emission.'],
+  ['Debt-For-Climate Swaps', 'finance', 'res1', 'Every round, each bloc gains 1 Resilience of its weakest type.'],
+  ['Forest Finance Facility', 'finance', 'trees', 'Add 2 Trees per bloc when this activates.'],
+  ['Ocean Protection Alliance', 'policy', 'oceans', 'Add 2 Oceans per bloc when this activates.'],
+  ['Early Warnings For All', 'research', 'shield', 'Every Crisis effect is reduced by 1 for each bloc.'],
+  ['Just Energy Partnerships', 'finance', 'clean1', 'Each bloc gains 1 Clean Energy every round.'],
+  ['Fossil Non-Proliferation Treaty', 'policy', 'phase1', 'Every round, each bloc removes 1 Dirty Energy if it can still meet demand.'],
+  ['Open Science Accord', 'research', 'draw1', 'Each bloc draws 1 extra card every round.']
+];
+const CRISIS_DEFS = [
+  ['Heatwave', 'all', 'cic', 'bands', 'social', 'community', 0],
+  ['River Flooding', 'all', 'cic', 2, 'infra', 'build', 0],
+  ['Drought', 'low:eco', 'loseres:eco', 2, '', 'hydro', 0],
+  ['Wildfires', 'all', 'trees', 1, '', 'nature', 0],
+  ['Crop Failure', 'all', 'cic', 2, 'eco', 'nature', 0],
+  ['Storm Surge', 'high:carbon', 'cic', 3, 'infra', 'build', 0],
+  ['Energy Price Shock', 'all', 'demand', 1, '', 'grid', 0],
+  ['Disinformation Campaign', 'all', 'cards', 1, '', 'community', 0],
+  ['Fossil Lobby Pushback', 'high:dirty', 'dirty', 2, '', 'policy', 0],
+  ['Coral Bleaching', 'all', 'oceans', 1, '', 'hydro', 0],
+  ['Climate Displacement', 'all', 'cic', 1, 'social', 'community', 0],
+  ['Financial Turmoil', 'all', 'drawminus', 1, '', 'finance', 0],
+  ['Grid Blackout', 'low:infra', 'loseres:infra', 2, '', 'grid', 0],
+  ['Disease Outbreak', 'all', 'cic', 1, 'social', 'research', 0],
+  ['Supply Chain Breakdown', 'all', 'cards', 1, '', 'build', 0],
+  ['Glacier Retreat', 'all', 'cic', 1, 'eco', 'hydro', 0],
+  ['Landslides', 'high:cic', 'cic', 2, 'infra', 'build', 0],
+  ['Locust Swarms', 'low:eco', 'cic', 3, 'eco', 'research', 0],
+  ['Water Scarcity', 'all', 'loseres:eco', 1, '', 'hydro', 0],
+  ['Permafrost Subsidence', 'all', 'loseres:infra', 1, '', 'build', 0],
+  ['Insurance Retreat', 'all', 'cic', 1, 'infra', 'finance', 0],
+  ['Sea Level Rise', 'all', 'cic', 'halfbands', 'infra', 'build', 0],
+  ['Hurricane Season', 'high:carbon', 'cic', 'bands', 'infra', 'build', 0],
+  ['Oil Spill', 'high:dirty', 'oceans', 2, '', 'policy', 0],
+  ['Smog Emergency', 'high:dirty', 'cic', 2, 'social', 'policy', 0],
+  ['Fishery Collapse', 'all', 'cic', 1, 'eco', 'hydro', 0],
+  ['Political Backlash', 'all', 'cards', 1, '', 'policy', 0],
+  ['Dust Storms', 'all', 'trees', 1, '', 'nature', 0],
+  ['Extreme Cold Snap', 'all', 'demand', 1, '', 'build', 0],
+  ['Deadly Humid Heat', 'low:social', 'cic', 'bands', 'social', 'community', 0],
+  ['Resource Conflict', 'high:cic', 'cic', 2, 'social', 'community', 1],
+  ['Trade Disputes', 'all', 'drawminus', 1, '', 'finance', 1]
+];
+const PLANET = [
+  ['weather', 'Storm Systems Shift', 'Draw 2 extra Crisis cards this round.'],
+  ['desert', 'Drylands Spread', 'Remove 1 Tree per bloc.'],
+  ['amazon', 'Rainforest Dieback', 'Add 1 Carbon per bloc to next round’s emissions and remove 1 Tree per bloc.'],
+  ['ice', 'Sea Ice Loss', 'Add 2 Carbon per bloc to the Thermometer.'],
+  ['thaw', 'Permafrost Thaw', 'Add 2 Carbon per bloc to next round’s emissions.'],
+  ['acid', 'Ocean Acidification', 'Remove 1 Ocean per bloc.']
+];
+const TIPPING = [2, 4, 5];
+const ROUNDS = 6;
+const MAX_BANDS = 8;
+const CIC_LOSS = 12;
+
+function parseAct(s) {
+  const a = s.split(':');
+  let arg = '';
+  let tag;
+  if (a.length === 3) { arg = a[1]; tag = a[2]; } else tag = a[1];
+  return { kind: a[0], arg: arg, tag: tag, cost: ACT[a[0]].cost, once: ACT[a[0]].once, multi: !!ACT[a[0]].multi };
+}
+const CARDS = [];
+CARD_DEFS.forEach(function (d) { CARDS.push({ id: CARDS.length, title: d[0], tags: d[1].split(','), act: parseAct(d[2]), bloc: '' }); });
+const DECK_SIZE = CARDS.length;
+Object.keys(BLOCS).forEach(function (k) {
+  BLOCS[k].startIds = BLOCS[k].start.map(function (d) { CARDS.push({ id: CARDS.length, title: d[0], tags: d[1].split(','), act: parseAct(d[2]), bloc: k }); return CARDS.length - 1; });
+});
+const GLOBALS = GLOBAL_DEFS.map(function (d, i) { return { id: i, title: d[0], tag: d[1], eff: d[2], text: d[3] }; });
+const CRISES = CRISIS_DEFS.map(function (d, i) { return { id: i, title: d[0], target: d[1], eff: d[2], amt: d[3], reduce: d[4], ignore: d[5], multi: !!d[6] }; });
+
+function rnd(n) { return Math.floor(Math.random() * n); }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); const x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function plural(n, word) { if (n === 1) return n + ' ' + word; return n + ' ' + word + 's'; }
+function rowSize(st) { return 5 * st.players.length; }
+function crisisCount(bands) { if (bands >= 6) return 5; if (bands >= 4) return 4; return 3; }
+function degrees(bands) { return (1.2 + bands * 0.1).toFixed(1); }
+function sumEmis(p) { let s = 0; EMIS.forEach(function (e) { s += p.emis[e]; }); return s; }
+function activeCount(st, eff) { let n = 0; st.globals.forEach(function (g) { if (g.active && GLOBALS[g.id].eff === eff) n++; }); return n; }
+function carbonOf(st, p) { return Math.max(0, p.dirty + sumEmis(p) - activeCount(st, 'emit1')); }
+function capacity(st) { return st.trees + st.oceans + st.dac; }
+function tagCount(ids, tag) { let n = 0; ids.forEach(function (id) { CARDS[id].tags.forEach(function (t) { if (t === tag) n++; }); }); return n; }
+function globalReq(st) { return 2 + st.players.length; }
+function ignoreNeed(st) { return 1 + Math.floor(st.players.length / 2); }
+function weakest(p) { let w = RES[0]; RES.forEach(function (r) { if (p.res[r] < p.res[w]) w = r; }); return w; }
+function shortfall(p) { return Math.max(0, p.demand - p.dirty - p.clean); }
+function blocName(st, i) { return BLOCS[st.players[i].bloc].name; }
+function addLog(st, txt, k) { st.logN = (st.logN || 0) + 1; st.log.push({ n: st.logN, txt: txt, k: k || '' }); if (st.log.length > 120) st.log.shift(); }
+function report(st, txt, k) { st.report.push({ txt: txt, k: k || '' }); addLog(st, txt, k); }
+function basePlayer(p) { return { name: p.name, kind: p.kind, level: p.level || '', client: p.client || '' }; }
+
+function drawCards(st, p, n) {
+  for (let i = 0; i < n; i++) {
+    if (!st.deck.length) {
+      if (!st.discard.length) return;
+      st.deck = shuffle(st.discard);
+      st.discard = [];
+    }
+    p.hand.push(st.deck.pop());
+  }
+}
+function drawCrisis(st, face) {
+  if (!st.cdeck.length) { st.cdeck = shuffle(st.cdiscard); st.cdiscard = []; }
+  if (!st.cdeck.length) return;
+  st.crises.push({ id: st.cdeck.pop(), face: face, tucked: [] });
+}
+function addThermo(st, x) {
+  const before = st.therm.bands;
+  st.therm.cubes += x;
+  while (st.therm.cubes >= rowSize(st)) { st.therm.cubes -= rowSize(st); st.therm.bands++; }
+  return st.therm.bands - before;
+}
+function removeThermo(st, x) {
+  let removed = 0;
+  while (x > 0) {
+    if (st.therm.cubes > 0) { const d = Math.min(st.therm.cubes, x); st.therm.cubes -= d; x -= d; removed += d; }
+    else if (st.therm.bands > 0) { st.therm.bands--; st.therm.cubes = rowSize(st); }
+    else break;
+  }
+  return removed;
+}
+function loseSinks(st, kind, k) {
+  if (st[kind] >= k) { st[kind] -= k; return 0; }
+  const missing = k - st[kind];
+  st[kind] = 0;
+  st.players.forEach(function (p) { p.cic += missing; });
+  return missing;
+}
+function sinkStart(settings, n, k) {
+  let m = 1;
+  if (settings && DIFFS[settings.diff]) m = DIFFS[settings.diff].mul;
+  return Math.round(SINKS[n][k] * m);
+}
+function newGame(players, settings, prev) {
+  const n = players.length;
+  let set = BLOC_SETS[n];
+  if (n === 1 && settings.bloc && BLOCS[settings.bloc]) set = [settings.bloc];
+  const ps = players.map(function (p, i) {
+    const b = BLOCS[set[i]];
+    const np = basePlayer(p);
+    np.bloc = set[i];
+    np.demand = b.demand; np.growth = b.growth; np.dirty = b.dirty; np.clean = b.clean;
+    np.emis = clone(b.emis); np.res = clone(b.res); np.cic = b.cic;
+    if (n === 1) { np.demand = SOLO_START.demand; np.dirty = SOLO_START.dirty; np.clean = SOLO_START.clean; np.emis = clone(SOLO_START.emis); np.growth = SOLO_START.growth; }
+    np.hand = []; np.stacks = b.startIds.map(function (id) { return [id]; }); np.used = {}; np.done = false; np.drawMinus = 0;
+    return np;
+  });
+  const deck = [];
+  for (let i = 0; i < DECK_SIZE; i++) { if (n === 1 && CARDS[i].act.multi) continue; deck.push(i); }
+  const cdeck = [];
+  CRISES.forEach(function (c) { if (n === 1 && c.multi) return; cdeck.push(c.id); });
+  const st = { v: 1, status: 'playing', phase: 'global', settings: settings, players: ps, deck: shuffle(deck), discard: [], gdeck: shuffle(GLOBALS.map(function (g) { return g.id; })), gdiscard: [], globals: [], offer: [], cdeck: shuffle(cdeck), cdiscard: [], crises: [], crisisAdded: 0, trees: sinkStart(settings, n, 0), oceans: sinkStart(settings, n, 1), dac: 0, therm: { bands: 0, cubes: 0 }, carry: 0, tracks: {}, round: 0, drawdown: false, report: [], lastReport: [], log: [], logN: 0, result: '', reason: '', seq: 0, hostClient: '', acks: {}, game: 1, history: [] };
+  PLANET.forEach(function (pl) { st.tracks[pl[0]] = 0; });
+  if (prev) { st.hostClient = prev.hostClient || ''; st.acks = prev.acks || {}; st.game = (prev.game || 0) + 1; }
+  startRound(st);
+  return st;
+}
+function startRound(st) {
+  st.round++;
+  st.phase = 'global';
+  st.report = [];
+  st.crises = [];
+  const k = crisisCount(st.therm.bands);
+  for (let i = 0; i < k; i++) drawCrisis(st, i === 0);
+  st.crisisAdded = k;
+  st.offer = [];
+  for (let i = 0; i < 2; i++) {
+    if (!st.gdeck.length) { st.gdeck = shuffle(st.gdiscard); st.gdiscard = []; }
+    if (st.gdeck.length) st.offer.push(st.gdeck.pop());
+  }
+  st.players.forEach(function (p) { p.done = false; p.used = {}; });
+  let fc = '';
+  if (st.crises.length) fc = ' The forecast crisis is ' + CRISES[st.crises[0].id].title + '.';
+  addLog(st, 'Round ' + st.round + ' begins at ' + degrees(st.therm.bands) + '°C.' + fc, 'round');
+}
+function startLocal(st) {
+  st.phase = 'local';
+  st.players.forEach(function (p) {
+    let n = 5 + activeCount(st, 'draw1') - p.drawMinus;
+    if (p.cic >= 8) n -= 2;
+    else if (p.cic >= 4) n -= 1;
+    p.drawMinus = 0;
+    drawCards(st, p, Math.max(0, n));
+    p.clean += activeCount(st, 'clean1');
+    p.done = false;
+    p.used = {};
+  });
+}
+function activate(st, g) {
+  g.active = true;
+  const gl = GLOBALS[g.id];
+  const n = st.players.length;
+  if (gl.eff === 'trees') st.trees += 2 * n;
+  if (gl.eff === 'oceans') st.oceans += 2 * n;
+  if (gl.eff === 'dac') st.dac += 2 * n;
+  addLog(st, gl.title + ' is now active. ' + gl.text, 'global');
+}
+function applyTake(st, seat, a, n, params) {
+  const p = st.players[seat];
+  const k = a.kind;
+  if (k === 'clean' || k === 'cleanfree') p.clean += n;
+  else if (k === 'phase') p.dirty = Math.max(0, p.dirty - n);
+  else if (k === 'cut') p.emis[a.arg] = Math.max(0, p.emis[a.arg] - n);
+  else if (k === 'elec') { const r = Math.min(n, p.emis[a.arg]); p.emis[a.arg] -= r; p.demand += r; }
+  else if (k === 'res') { let r = a.arg; if (r === 'any') { r = params.res; if (RES.indexOf(r) < 0) r = weakest(p); } p.res[r] += n; }
+  else if (k === 'draw') drawCards(st, p, n);
+  else if (k === 'tree') st.trees += n;
+  else if (k === 'ocean') st.oceans += n;
+  else if (k === 'dac') st.dac += n;
+  else if (k === 'eff') p.demand = Math.max(0, p.demand - n);
+  else if (k === 'aid') st.players[params.to].clean += n;
+  else if (k === 'aidres') { const t = st.players[params.to]; t.res[weakest(t)] += n; }
+  else if (k === 'relief') p.cic = Math.max(0, p.cic - n);
+  else if (k === 'geo') {
+    const removed = removeThermo(st, 2 * n);
+    const roll = 1 + rnd(6);
+    let msg = blocName(st, seat) + ' tried geoengineering, removing ' + removed + ' Carbon from the Thermometer';
+    if (roll === 1) { p.cic += 2; msg += ', but side effects added 2 Communities in Crisis'; }
+    addLog(st, msg + '.', 'geo');
+  }
+}
+function finish(st, result, reason) {
+  st.status = 'over';
+  st.phase = 'over';
+  st.result = result;
+  st.reason = reason;
+  report(st, reason, result);
+}
+function lossCheck(st) {
+  if (st.therm.bands >= MAX_BANDS) { finish(st, 'lose', 'The Thermometer reached 2.0°C. The climate has tipped beyond recovery.'); return true; }
+  for (let i = 0; i < st.players.length; i++) {
+    if (st.players[i].cic >= CIC_LOSS) { finish(st, 'lose', blocName(st, i) + ' has ' + CIC_LOSS + ' Communities in Crisis. Society can no longer hold together.'); return true; }
+  }
+  return false;
+}
+function topUpCrises(st) {
+  while (crisisCount(st.therm.bands) > st.crisisAdded) { drawCrisis(st, false); st.crisisAdded++; report(st, 'Warming brought an extra Crisis card this round.', 'crisis'); }
+}
+function rollPlanet(st) {
+  const face = rnd(6);
+  const pl = PLANET[face];
+  const prev = st.tracks[pl[0]];
+  let now = prev;
+  if (now < 5) now++;
+  st.tracks[pl[0]] = now;
+  const tip = prev === 5 || TIPPING.indexOf(now) >= 0;
+  if (!tip) { report(st, 'Planetary die: ' + pl[1] + ' advanced, with no tipping point yet.', 'planet'); return; }
+  const n = st.players.length;
+  let extra = '';
+  if (pl[0] === 'weather') { drawCrisis(st, false); drawCrisis(st, false); }
+  else if (pl[0] === 'desert') { if (loseSinks(st, 'trees', n)) extra = ' There were not enough Trees, so every bloc gained Communities in Crisis.'; }
+  else if (pl[0] === 'amazon') { st.carry += n; if (loseSinks(st, 'trees', n)) extra = ' There were not enough Trees, so every bloc gained Communities in Crisis.'; }
+  else if (pl[0] === 'ice') addThermo(st, 2 * n);
+  else if (pl[0] === 'thaw') st.carry += 2 * n;
+  else if (pl[0] === 'acid') { if (loseSinks(st, 'oceans', n)) extra = ' There were not enough Oceans, so every bloc gained Communities in Crisis.'; }
+  report(st, 'Tipping point! ' + pl[1] + ': ' + pl[2] + extra, 'planet');
+}
+function crisisTargets(st, cr) {
+  const all = st.players.map(function (p, i) { return i; });
+  if (cr.target === 'all') return all;
+  const parts = cr.target.split(':');
+  const metric = function (p) {
+    if (parts[1] === 'carbon') return carbonOf(st, p);
+    if (parts[1] === 'dirty') return p.dirty;
+    if (parts[1] === 'cic') return p.cic;
+    return p.res[parts[1]];
+  };
+  let best = null;
+  st.players.forEach(function (p) { const m = metric(p); if (best === null || (parts[0] === 'low' && m < best) || (parts[0] === 'high' && m > best)) best = m; });
+  const tied = all.filter(function (i) { return metric(st.players[i]) === best; });
+  if (tied.length === 1) return tied;
+  return [tied[rnd(tied.length)]];
+}
+function resolveCrisis(st, c) {
+  const cr = CRISES[c.id];
+  c.face = true;
+  if (tagCount(c.tucked, cr.ignore) >= ignoreNeed(st)) { report(st, cr.title + ' was averted by the projects tucked under it.', 'saved'); return; }
+  let amt = cr.amt;
+  if (amt === 'bands') amt = Math.max(1, st.therm.bands);
+  if (amt === 'halfbands') amt = Math.max(1, Math.ceil(st.therm.bands / 2));
+  const shield = activeCount(st, 'shield');
+  crisisTargets(st, cr).forEach(function (seat) {
+    const p = st.players[seat];
+    let a = amt - shield;
+    let note = '';
+    if (cr.reduce) { a -= p.res[cr.reduce]; if (p.res[cr.reduce]) note = ' after ' + RES_NAME[cr.reduce] + ' Resilience'; }
+    const who = blocName(st, seat);
+    if (a <= 0) { report(st, cr.title + ': ' + who + ' was protected' + note + '.', 'saved'); return; }
+    const parts = cr.eff.split(':');
+    let what = '';
+    if (parts[0] === 'cic') { p.cic += a; what = 'gained ' + plural(a, 'Community') + ' in Crisis'; what = what.replace('Communitys', 'Communities'); }
+    else if (parts[0] === 'loseres') { const lose = Math.min(p.res[parts[1]], a); p.res[parts[1]] -= lose; p.cic += a - lose; what = 'lost ' + lose + ' ' + RES_NAME[parts[1]] + ' Resilience'; if (a - lose) what += ' and gained ' + (a - lose) + ' Communities in Crisis'; }
+    else if (parts[0] === 'trees') { const m = loseSinks(st, 'trees', a); what = 'lost ' + plural(a, 'Tree') + ' from the shared forests'; if (m) what += ', and missing Trees put communities everywhere in crisis'; }
+    else if (parts[0] === 'oceans') { const m = loseSinks(st, 'oceans', a); what = 'lost ' + plural(a, 'Ocean') + ' of carbon storage'; if (m) what += ', and missing Oceans put communities everywhere in crisis'; }
+    else if (parts[0] === 'demand') { p.demand += a; what = 'saw Energy Demand rise by ' + a; }
+    else if (parts[0] === 'cards') { let k = 0; for (let i = 0; i < a && p.hand.length; i++) { st.discard.push(p.hand.splice(rnd(p.hand.length), 1)[0]); k++; } what = 'lost ' + plural(k, 'card') + ' from hand'; }
+    else if (parts[0] === 'dirty') { p.dirty += a; what = 'added ' + a + ' Dirty Energy'; }
+    else if (parts[0] === 'drawminus') { p.drawMinus += a; what = 'will draw ' + plural(a, 'fewer card').replace('fewer cards', 'fewer cards') + ' next round'; }
+    report(st, cr.title + ': ' + who + ' ' + what + note + '.', 'crisis');
+  });
+}
+function runEnd(st) {
+  st.report = [];
+  const before = { bands: st.therm.bands, cubes: st.therm.cubes };
+  st.players.forEach(function (p) {
+    [['fuel1', 'fuel'], ['build1', 'buildings'], ['trans1', 'transport'], ['agri1', 'agriculture'], ['waste1', 'waste'], ['ind1', 'industry']].forEach(function (e) {
+      const k = activeCount(st, e[0]);
+      if (k) p.emis[e[1]] = Math.max(0, p.emis[e[1]] - k);
+    });
+    const ph = activeCount(st, 'phase1');
+    for (let i = 0; i < ph; i++) if (p.dirty > 0 && p.dirty - 1 + p.clean >= p.demand) p.dirty--;
+  });
+  st.players.forEach(function (p, i) {
+    const s = shortfall(p);
+    if (s > 0) { p.cic += s; report(st, blocName(st, i) + ' fell ' + s + ' short of its Energy Demand and gained ' + s + ' Communities in Crisis.', 'crisis'); }
+  });
+  let recent = st.carry;
+  const carried = st.carry;
+  st.carry = 0;
+  const byBloc = [];
+  st.players.forEach(function (p, i) { const c = carbonOf(st, p); recent += c; byBloc.push(blocName(st, i) + ' ' + c); });
+  const cap = capacity(st);
+  let line = 'Emissions: ' + byBloc.join(', ');
+  if (carried) line += ', plus ' + carried + ' from thawing and dieback';
+  line += ', ' + recent + ' Carbon in total. Trees, Oceans and capture absorbed ' + Math.min(recent, cap) + ' of ' + cap + '.';
+  report(st, line, 'emit');
+  st.drawdown = false;
+  if (recent < cap) {
+    const removed = removeThermo(st, cap - recent);
+    st.drawdown = true;
+    report(st, 'Drawdown! The world now removes more Carbon than it emits. ' + removed + ' Carbon was pulled back off the Thermometer. Survive this Crisis stage to win.', 'win');
+  } else if (recent > cap) {
+    const added = addThermo(st, recent - cap);
+    let msg = (recent - cap) + ' Carbon went onto the Thermometer';
+    if (added) msg += ', adding ' + plural(added, 'Temperature Band') + '. It is now ' + degrees(st.therm.bands) + '°C';
+    report(st, msg + '.', 'heat');
+  } else report(st, 'Emissions exactly matched what the planet absorbed.', 'emit');
+  st.history.push({ round: st.round, emitted: recent, absorbed: Math.min(recent, cap), bands: st.therm.bands });
+  if (lossCheck(st)) return;
+  topUpCrises(st);
+  let rolls = st.therm.bands;
+  for (let i = 0; i < rolls; i++) {
+    const b = st.therm.bands;
+    rollPlanet(st);
+    if (st.therm.bands > b) rolls += st.therm.bands - b;
+    if (lossCheck(st)) return;
+  }
+  topUpCrises(st);
+  for (let c = 0; c < st.crises.length; c++) {
+    resolveCrisis(st, st.crises[c]);
+    if (lossCheck(st)) return;
+  }
+  st.crises.forEach(function (c) { st.cdiscard.push(c.id); c.tucked.forEach(function (id) { st.discard.push(id); }); });
+  st.crises = [];
+  if (st.drawdown) { finish(st, 'win', 'Daybreak for the planet: you reached drawdown and survived the crises that followed. Everyone wins.'); return; }
+  if (st.round >= ROUNDS) { finish(st, 'lose', 'Round ' + ROUNDS + ' ended without reaching drawdown.'); return; }
+  st.players.forEach(function (p) {
+    p.demand += Math.max(0, p.growth - activeCount(st, 'demand'));
+    const rl = activeCount(st, 'relief');
+    if (rl) p.cic = Math.max(0, p.cic - rl);
+    const rs = activeCount(st, 'res1');
+    if (rs) p.res[weakest(p)] += rs;
+  });
+  report(st, 'Growth: every bloc’s Energy Demand rose.', 'grow');
+  st.phase = 'report';
+}
+function step(st, a) {
+  if (a.type === 'join') {
+    const name = String(a.name || 'Guest').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, 18) || 'Guest';
+    const i = st.players.findIndex(function (p) { return p.client && p.client === a.client; });
+    if (i >= 0) { if (st.status === 'lobby') st.players[i].name = name; return ''; }
+    if (st.status !== 'lobby') return 'The game has already started.';
+    if (st.players.length >= 4) return 'The room is full.';
+    st.players.push({ name: name, kind: 'human', level: '', client: String(a.client) });
+    return '';
+  }
+  if (a.type === 'addBot') {
+    if (st.status === 'playing') return 'Add bots between games.';
+    if (st.players.length >= 4) return 'The room is full.';
+    const names = ['Ines', 'Kofi', 'Mei', 'Lars'];
+    const used = st.players.map(function (q) { return q.name; });
+    let nm = names.find(function (x) { return used.indexOf(x) < 0; });
+    if (!nm) nm = 'Bot';
+    st.players.push({ name: nm, kind: 'bot', level: 'normal', client: '' });
+    return '';
+  }
+  if (a.type === 'removePlayer') {
+    if (st.status === 'playing') return 'Remove players between games.';
+    if (!(a.index > 0 && a.index < st.players.length)) return 'That seat cannot be removed.';
+    st.players.splice(a.index, 1);
+    return '';
+  }
+  if (st.status !== 'playing') return 'The game is not running.';
+  if (a.type === 'pickGlobal') {
+    if (st.phase !== 'global') return 'The summit is over for this round.';
+    if (a.pick >= 0) {
+      if (a.pick >= st.offer.length) return 'Choose one of the offered projects.';
+      if (st.globals.length >= 4) {
+        if (!(a.replace >= 0 && a.replace < st.globals.length)) return 'Four projects are in play. Choose one to replace.';
+        const old = st.globals.splice(a.replace, 1)[0];
+        st.gdiscard.push(old.id);
+        old.tucked.forEach(function (id) { st.discard.push(id); });
+      }
+      const gid = st.offer[a.pick];
+      st.globals.push({ id: gid, tucked: [], active: false });
+      st.offer.forEach(function (id, i) { if (i !== a.pick) st.gdiscard.push(id); });
+      addLog(st, 'The summit chose ' + GLOBALS[gid].title + '. It needs ' + globalReq(st) + ' ' + TAGS[GLOBALS[gid].tag][0] + ' tags to activate.', 'global');
+    } else {
+      st.offer.forEach(function (id) { st.gdiscard.push(id); });
+      addLog(st, 'The summit chose not to start a new Global Project.', 'global');
+    }
+    st.offer = [];
+    startLocal(st);
+    return '';
+  }
+  if (a.type === 'continue') {
+    if (st.phase !== 'report') return 'Nothing to continue.';
+    st.lastReport = st.report.slice();
+    startRound(st);
+    return '';
+  }
+  const p = st.players[a.seat];
+  if (!p) return 'Unknown bloc.';
+  if (st.phase !== 'local') return 'Projects are played in the Local stage.';
+  if (a.type === 'done') {
+    p.done = a.done !== false;
+    if (st.players.every(function (q) { return q.done; })) runEnd(st);
+    return '';
+  }
+  if (p.done) return 'You have already finished this round. Tap Keep Working to make changes.';
+  if (a.type === 'play' || a.type === 'tuck' || a.type === 'support' || a.type === 'ctuck') {
+    if (p.hand.indexOf(a.card) < 0) return 'That card is not in your hand.';
+    const c = CARDS[a.card];
+    if (a.type === 'play') {
+      if (a.stack === -1) { if (p.stacks.length >= 5) return 'You already have 5 stacks.'; p.hand.splice(p.hand.indexOf(a.card), 1); p.stacks.push([a.card]); return ''; }
+      if (!p.stacks[a.stack]) return 'Choose a stack.';
+      p.hand.splice(p.hand.indexOf(a.card), 1);
+      p.stacks[a.stack].push(a.card);
+      return '';
+    }
+    if (a.type === 'tuck') {
+      if (!p.stacks[a.stack]) return 'Choose a stack.';
+      p.hand.splice(p.hand.indexOf(a.card), 1);
+      p.stacks[a.stack].unshift(a.card);
+      return '';
+    }
+    if (a.type === 'support') {
+      const g = st.globals[a.g];
+      if (!g || g.active) return 'Choose a Global Project that still needs support.';
+      if (c.tags.indexOf(GLOBALS[g.id].tag) < 0) return 'That card has no ' + TAGS[GLOBALS[g.id].tag][0] + ' tag.';
+      p.hand.splice(p.hand.indexOf(a.card), 1);
+      g.tucked.push(a.card);
+      if (tagCount(g.tucked, GLOBALS[g.id].tag) >= globalReq(st)) activate(st, g);
+      return '';
+    }
+    const cr = st.crises[a.c];
+    if (!cr || !cr.face) return 'Cards can only go under the forecast crisis.';
+    if (c.tags.indexOf(CRISES[cr.id].ignore) < 0) return 'That card has no ' + TAGS[CRISES[cr.id].ignore][0] + ' tag.';
+    p.hand.splice(p.hand.indexOf(a.card), 1);
+    cr.tucked.push(a.card);
+    return '';
+  }
+  if (a.type === 'take') {
+    const stack = p.stacks[a.stack];
+    if (!stack) return 'Choose a stack.';
+    const front = stack[stack.length - 1];
+    const act = CARDS[front].act;
+    if (act.multi && st.players.length < 2) return 'That action needs another bloc.';
+    if (act.once && p.used[front]) return 'That action has already been used this round.';
+    const n = tagCount(stack, act.tag);
+    if (n <= 0) return 'This stack has no ' + TAGS[act.tag][0] + ' tags.';
+    let pay = [];
+    if (Array.isArray(a.pay)) pay = a.pay;
+    if (pay.length !== act.cost) return 'Discard ' + plural(act.cost, 'card') + ' from your hand to take this action.';
+    const seen = {};
+    for (let i = 0; i < pay.length; i++) { if (seen[pay[i]] || p.hand.indexOf(pay[i]) < 0) return 'Pay with cards from your hand.'; seen[pay[i]] = 1; }
+    if (act.multi && !(a.to >= 0 && a.to < st.players.length && a.to !== a.seat)) return 'Choose another bloc to help.';
+    pay.forEach(function (id) { p.hand.splice(p.hand.indexOf(id), 1); st.discard.push(id); });
+    applyTake(st, a.seat, act, n, a);
+    if (act.once) p.used[front] = true;
+    return '';
+  }
+  return 'Unknown action.';
+}
+function reduce(st0, a) {
+  if (!st0 || !a || typeof a.type !== 'string') return { error: 'Unknown action.' };
+  let st;
+  if (a.type === 'start' || a.type === 'again') {
+    if (st0.status === 'playing') return { error: 'The game is already running.' };
+    st = newGame(st0.players, st0.settings, st0);
+  } else {
+    st = clone(st0);
+    const err = step(st, a);
+    if (err) return { error: err };
+  }
+  st.seq = (st0.seq || 0) + 1;
+  return { state: st };
+}
+
+/* Bots */
+function tryOn(st, a) { const r = reduce(st, a); if (r.error) return null; return r.state; }
+function blocValue(st, seat) {
+  const p = st.players[seat];
+  const bands = st.therm.bands;
+  let v = 0;
+  v -= (p.dirty + sumEmis(p)) * (1.3 + bands * 0.15);
+  v -= shortfall(p) * 4.6;
+  RES.forEach(function (r) { v += Math.min(p.res[r], bands + 2) * 0.7; });
+  v -= p.cic * 2.4;
+  v += p.hand.length * 0.3;
+  v += capacity(st) * 1.2;
+  v -= (st.therm.bands * rowSize(st) + st.therm.cubes) * 0.45;
+  v -= p.demand * 0.55;
+  st.players.forEach(function (q, i) { if (i !== seat) v -= shortfall(q) * 1.6; });
+  return v;
+}
+function usefulness(st, p, id) {
+  let u = 0;
+  CARDS[id].tags.forEach(function (t) {
+    p.stacks.forEach(function (s) { if (CARDS[s[s.length - 1]].act.tag === t) u += 1; });
+    st.globals.forEach(function (g) { if (!g.active && GLOBALS[g.id].tag === t) u += 0.6; });
+  });
+  return u;
+}
+function payFor(st, seat, cost, exclude) {
+  const p = st.players[seat];
+  const opts = p.hand.filter(function (id) { return exclude.indexOf(id) < 0; });
+  if (opts.length < cost) return null;
+  opts.sort(function (a, b) { return usefulness(st, p, a) - usefulness(st, p, b); });
+  return opts.slice(0, cost);
+}
+function takeAct(st, seat, si, exclude) {
+  const p = st.players[seat];
+  const stack = p.stacks[si];
+  if (!stack) return null;
+  const front = stack[stack.length - 1];
+  const a = CARDS[front].act;
+  if (a.once && p.used[front]) return null;
+  if (a.multi && st.players.length < 2) return null;
+  if (tagCount(stack, a.tag) <= 0) return null;
+  const pay = payFor(st, seat, a.cost, exclude || []);
+  if (!pay) return null;
+  const act = { type: 'take', seat: seat, stack: si, pay: pay };
+  if (a.kind === 'res' && a.arg === 'any') act.res = weakest(p);
+  if (a.multi) {
+    let best = -1;
+    let need = -1;
+    st.players.forEach(function (q, i) {
+      if (i === seat) return;
+      let w = shortfall(q) * 3 + (q.dirty + sumEmis(q)) * 0.1;
+      if (a.kind === 'aidres') w = 10 - q.res[weakest(q)];
+      if (w > need) { need = w; best = i; }
+    });
+    act.to = best;
+  }
+  return act;
+}
+function freshUse(st, seat) { const s = clone(st); s.players[seat].used = {}; return s; }
+function botLocal(st, seat) {
+  const p = st.players[seat];
+  const base = blocValue(st, seat);
+  const ff = Math.min(3, ROUNDS - st.round) * 0.45;
+  let best = null;
+  let bestV = 0.35;
+  function consider(a, v) { if (v > bestV) { bestV = v; best = a; } }
+  function delta(s) { if (!s) return -99; return blocValue(s, seat) - base; }
+  p.stacks.forEach(function (s, i) {
+    const t = takeAct(st, seat, i);
+    if (t) consider(t, delta(tryOn(st, t)));
+  });
+  const freshBase = freshUse(st, seat);
+  const frontValue = p.stacks.map(function (s, i) {
+    const t = takeAct(freshBase, seat, i);
+    if (!t) return 0;
+    return Math.max(0, delta(tryOn(freshBase, t)));
+  });
+  p.hand.forEach(function (card) {
+    const targets = p.stacks.map(function (s, i) { return i; });
+    if (p.stacks.length < 5) targets.push(-1);
+    targets.forEach(function (si) {
+      const play = { type: 'play', seat: seat, card: card, stack: si };
+      const s1 = tryOn(st, play);
+      if (!s1) return;
+      let idx = si;
+      if (si === -1) idx = s1.players[seat].stacks.length - 1;
+      const t = takeAct(s1, seat, idx);
+      if (!t) return;
+      const now = delta(tryOn(s1, t));
+      const fs = freshUse(s1, seat);
+      const ft = takeAct(fs, seat, idx);
+      let fut = 0;
+      if (ft) fut = Math.max(0, delta(tryOn(fs, ft)));
+      let loss = 0;
+      if (si >= 0) {
+        const front = p.stacks[si][p.stacks[si].length - 1];
+        loss = frontValue[si] * ff;
+        if (!p.used[front]) loss += frontValue[si] * 0.5;
+      }
+      consider(play, now + fut * ff - loss - 0.2);
+    });
+    p.stacks.forEach(function (s, si) {
+      if (frontValue[si] <= 0) return;
+      const tuck = { type: 'tuck', seat: seat, card: card, stack: si };
+      const s1 = tryOn(freshBase, tuck);
+      if (!s1) return;
+      const t = takeAct(s1, seat, si);
+      if (!t) return;
+      const inc = delta(tryOn(s1, t)) - frontValue[si];
+      if (inc <= 0) return;
+      const front = s[s.length - 1];
+      let mult = ff;
+      if (!p.used[front]) mult += 1;
+      consider(tuck, inc * mult - 0.3);
+    });
+    st.globals.forEach(function (g, gi) {
+      if (g.active) return;
+      const tag = GLOBALS[g.id].tag;
+      const has = CARDS[card].tags.filter(function (t) { return t === tag; }).length;
+      if (!has) return;
+      const s1 = tryOn(st, { type: 'support', seat: seat, card: card, g: gi });
+      if (!s1) return;
+      const need = globalReq(st) - tagCount(g.tucked, tag);
+      let v = 1.1 * has + Math.max(0, 3 - need) * 0.6;
+      if (s1.globals[gi].active) v += 4 + delta(s1);
+      consider({ type: 'support', seat: seat, card: card, g: gi }, v - usefulness(st, p, card) * 0.5 - 0.3);
+    });
+    st.crises.forEach(function (c, ci) {
+      if (!c.face) return;
+      const cr = CRISES[c.id];
+      const has = CARDS[card].tags.filter(function (t) { return t === cr.ignore; }).length;
+      if (!has || tagCount(c.tucked, cr.ignore) >= ignoreNeed(st)) return;
+      let amt = cr.amt;
+      if (amt === 'bands') amt = Math.max(1, st.therm.bands);
+      if (amt === 'halfbands') amt = Math.max(1, Math.ceil(st.therm.bands / 2));
+      let hits = 1;
+      if (cr.target === 'all') hits = st.players.length;
+      let harm = amt * hits * 2.2;
+      if (cr.reduce) harm -= p.res[cr.reduce] * hits * 1.5;
+      if (harm <= 0) return;
+      consider({ type: 'ctuck', seat: seat, card: card, c: ci }, harm * has / ignoreNeed(st) - usefulness(st, p, card) * 0.5 - 0.3);
+    });
+  });
+  if (best) return best;
+  return { type: 'done', seat: seat, done: true };
+}
+function botGlobal(st) {
+  if (!st.offer.length) return { type: 'pickGlobal', pick: -1 };
+  const order = ['emit1', 'clean1', 'shield', 'draw1', 'ind1', 'trans1', 'build1', 'trees', 'oceans', 'dac', 'relief', 'agri1', 'fuel1', 'demand', 'phase1', 'res1', 'waste1'];
+  let pick = 0;
+  if (st.offer.length > 1 && order.indexOf(GLOBALS[st.offer[1]].eff) < order.indexOf(GLOBALS[st.offer[0]].eff)) pick = 1;
+  if (st.globals.length < 4) return { type: 'pickGlobal', pick: pick };
+  let worst = -1;
+  let least = 1e9;
+  st.globals.forEach(function (g, i) { if (!g.active && g.tucked.length < least) { least = g.tucked.length; worst = i; } });
+  if (worst < 0) return { type: 'pickGlobal', pick: -1 };
+  return { type: 'pickGlobal', pick: pick, replace: worst };
+}
+
+
+const CODE_ABC = 'BCDFGHJKLMNPQRSTVWXZ23456789';
+const PEER_PREFIX = 'commonsky-v1-';
+const PEER_LIB = 'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js';
+const GAME_ACTS = ['play', 'tuck', 'support', 'ctuck', 'take', 'done', 'pickGlobal', 'continue'];
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function cleanName(n, fallback) { let s = String(n || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, 18); if (!s) s = fallback; return s; }
+function genCode() { let s = ''; for (let i = 0; i < 5; i++) s += CODE_ABC[rnd(CODE_ABC.length)]; return s; }
+function lobbyState(hostName, settings) {
+  return { v: 1, status: 'lobby', settings: settings, players: [{ name: hostName, kind: 'human', level: '', client: Net.me }], hostClient: Net.me, acks: {}, seq: 0, log: [], logN: 0 };
+}
+
+/* ---------- Session and networking ---------- */
+
+const Net = { mode: 'local', kind: '', code: '', me: '', transport: null };
+let S = null;
+let botSpeed = 1;
+const UI = { screen: 'home', built: '', sel: -1, pendingN: 0, pay: null, payPick: [], coachText: '', pending: 0, conn: true, confirmLeave: false, hsNames: [], joining: '', revealed: -1, replace: -1 };
+const ONLINE = { env: 'peer', db: null, user: null, resume: [] };
+if (window.claude && typeof window.claude.use === 'function') ONLINE.env = 'cloud-pending';
+
+function loadLocal(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+function saveLocal(k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } }
+function loadPrefs() { try { const p = JSON.parse(loadLocal('cs-prefs') || '{}'); if (p && typeof p === 'object') return p; } catch (e) { /* ignore */ } return {}; }
+function savePrefs(patch) { saveLocal('cs-prefs', JSON.stringify(Object.assign(loadPrefs(), patch))); }
+function localId() {
+  let id = loadLocal('cs-id');
+  if (!id) { id = 'c' + Math.random().toString(36).slice(2, 12); saveLocal('cs-id', id); }
+  return id;
+}
+function activeHotseat() {
+  if (!S || !S.players) return -1;
+  if (S.phase === 'local') {
+    const i = S.players.findIndex(function (p) { return p.kind === 'human' && !p.done; });
+    if (i >= 0) return i;
+  }
+  return 0;
+}
+function mySeat() {
+  if (!S || !S.players) return -1;
+  if (Net.kind === 'practice') return S.players.findIndex(function (p) { return p.client === 'me'; });
+  if (Net.kind === 'hotseat') return activeHotseat();
+  return S.players.findIndex(function (p) { return p.client === Net.me; });
+}
+function resetUI() {
+  UI.sel = -1; UI.pay = null; UI.payPick = []; UI.coachText = ''; UI.pending = 0; UI.conn = true; UI.confirmLeave = false; UI.revealed = -1; UI.replace = -1;
+  botKey = ''; clearTimeout(botTimer);
+}
+function dispatch(a) {
+  if (Net.mode === 'guest') {
+    if (UI.pending) { toast('Waiting for the host to confirm your last move.'); return; }
+    let n = 0;
+    if (Net.transport) n = Net.transport.send({ type: 'act', action: a }) || 0;
+    UI.pending = Date.now();
+    UI.pendingN = n;
+    render();
+    return;
+  }
+  applyAction(a, false);
+}
+function applyAction(a, quiet) {
+  const r = reduce(S, a);
+  if (r.error) { if (!quiet) toast(r.error, 'bad'); return false; }
+  setState(r.state);
+  if (Net.mode === 'host' && Net.transport) Net.transport.publish();
+  return true;
+}
+function setState(ns) { S = ns; onState(); }
+function onState() {
+  const me = mySeat();
+  if (UI.sel >= 0 && (!S.players[me] || !S.players[me].hand || S.players[me].hand.indexOf(UI.sel) < 0)) UI.sel = -1;
+  if (S.phase !== 'local') { UI.pay = null; UI.payPick = []; }
+  let landed = true;
+  if (UI.pendingN && S.acks && (S.acks[Net.me] || 0) < UI.pendingN) landed = false;
+  if (landed) { UI.pending = 0; UI.pendingN = 0; }
+  if (S.status === 'lobby') UI.screen = 'lobby';
+  else UI.screen = 'game';
+  if (Net.mode === 'host' && Net.transport && Net.transport.kind === 'peer') saveLocal('cs-host', JSON.stringify({ code: Net.code, s: S, at: Date.now() }));
+  render();
+  driveBots();
+}
+let botTimer = 0;
+let botKey = '';
+function driveBots() {
+  if (Net.mode === 'guest' || !S || S.status !== 'playing' || S.phase !== 'local') return;
+  const seat = S.players.findIndex(function (p) { return p.kind === 'bot' && !p.done; });
+  if (seat < 0) return;
+  const k = String(S.seq);
+  if (k === botKey) return;
+  botKey = k;
+  clearTimeout(botTimer);
+  const seq = S.seq;
+  botTimer = setTimeout(function () {
+    if (!S || S.seq !== seq || S.phase !== 'local') return;
+    const a = botLocal(S, seat);
+    if (!applyAction(a, true)) applyAction({ type: 'done', seat: seat, done: true }, true);
+  }, Math.max(30, Math.round(320 * botSpeed)));
+}
+function hostReceive(cid, m) {
+  if (!S || !cid || !m) return;
+  if (m.type === 'hello') {
+    if (!applyAction({ type: 'join', client: cid, name: m.name }, true) && Net.transport) Net.transport.publish();
+    return;
+  }
+  if (m.type === 'act' && m.action && GAME_ACTS.indexOf(m.action.type) >= 0) {
+    const seat = S.players.findIndex(function (p) { return p.client === cid; });
+    if (seat < 0) return;
+    if (m.action.type !== 'pickGlobal' && m.action.type !== 'continue' && m.action.seat !== seat) return;
+    if (!applyAction(m.action, true) && Net.transport) Net.transport.publish();
+  }
+}
+function loadPeerLib() {
+  if (window.Peer) return Promise.resolve();
+  return new Promise(function (res, rej) {
+    const s = document.createElement('script');
+    s.src = PEER_LIB;
+    s.onload = function () { res(); };
+    s.onerror = function () { rej(new Error('Could not load the connection library. Check your internet connection.')); };
+    document.head.appendChild(s);
+  });
+}
+function peerErrorText(e) {
+  const t = e && e.type;
+  if (t === 'peer-unavailable') return 'Could not find that room. Check the code, and make sure the host still has the page open.';
+  if (t === 'network' || t === 'server-error' || t === 'socket-error' || t === 'socket-closed') return 'Could not reach the connection service. Check your internet connection and try again.';
+  if (t === 'browser-incompatible') return 'This browser cannot make peer-to-peer connections.';
+  if (t === 'unavailable-id') return 'That room code is already in use.';
+  if (e && e.message) return e.message;
+  return 'Connection problem.';
+}
+function openPeer(id) {
+  return new Promise(function (res, rej) {
+    let p;
+    if (id) p = new window.Peer(id, { debug: 0 });
+    else p = new window.Peer({ debug: 0 });
+    let done = false;
+    p.on('open', function () { if (!done) { done = true; res(p); } });
+    p.on('error', function (e) { if (!done) { done = true; try { p.destroy(); } catch (x) { /* ignore */ } rej(e); } });
+    setTimeout(function () { if (!done) { done = true; try { p.destroy(); } catch (x) { /* ignore */ } rej(new Error('The connection service did not answer. Try again in a moment.')); } }, 12000);
+  });
+}
+async function peerHost(name, settings, resume) {
+  await loadPeerLib();
+  let peer = null;
+  let code = '';
+  for (let i = 0; i < 4 && !peer; i++) {
+    if (resume) code = resume.code;
+    else code = genCode();
+    try { peer = await openPeer(PEER_PREFIX + code); }
+    catch (e) { if (resume || !e || e.type !== 'unavailable-id') throw e; }
+  }
+  if (!peer) throw new Error('Could not create a room. Try again.');
+  const conns = new Map();
+  function sendState(c) { if (c.open && S) c.send({ type: 'state', s: S }); }
+  peer.on('connection', function (conn) {
+    conn.on('data', function (m) {
+      if (!m || typeof m !== 'object') return;
+      if (m.type === 'hello') { conns.set(conn, String(m.clientId || '')); hostReceive(conns.get(conn), m); sendState(conn); return; }
+      const cid = conns.get(conn);
+      if (cid) hostReceive(cid, m);
+    });
+    conn.on('close', function () { conns.delete(conn); });
+    conn.on('error', function () { conns.delete(conn); });
+  });
+  peer.on('disconnected', function () { try { peer.reconnect(); } catch (e) { /* ignore */ } });
+  peer.on('error', function (e) { if (e && e.type === 'peer-unavailable') return; toast(peerErrorText(e), 'bad'); });
+  Net.transport = { kind: 'peer', publish: function () { conns.forEach(function (cid, c) { sendState(c); }); }, close: function () { try { peer.destroy(); } catch (e) { /* ignore */ } } };
+  Net.code = code;
+  Net.mode = 'host';
+  Net.kind = 'online';
+  resetUI();
+  if (resume) setState(clone(resume.s));
+  else setState(lobbyState(name, settings));
+  Net.transport.publish();
+}
+async function peerJoin(code, name) {
+  await loadPeerLib();
+  const peer = await openPeer(null);
+  let conn = null;
+  let ever = false;
+  let closed = false;
+  let retryT = 0;
+  Net.mode = 'guest';
+  Net.kind = 'online';
+  Net.code = code;
+  function setConn(v) { UI.conn = v; renderTop(); }
+  function connect() {
+    if (closed) return;
+    conn = peer.connect(PEER_PREFIX + code, { reliable: true });
+    conn.on('open', function () { ever = true; setConn(true); conn.send({ type: 'hello', clientId: Net.me, name: name }); });
+    conn.on('data', function (m) { if (m && m.type === 'state' && m.s) setState(m.s); });
+    conn.on('close', function () { if (closed) return; setConn(false); clearTimeout(retryT); retryT = setTimeout(connect, 3000); });
+  }
+  return new Promise(function (res, rej) {
+    peer.on('error', function (e) {
+      if (closed) return;
+      if (!ever) { closed = true; try { peer.destroy(); } catch (x) { /* ignore */ } rej(e); return; }
+      setConn(false);
+      clearTimeout(retryT);
+      retryT = setTimeout(connect, 3000);
+    });
+    peer.on('disconnected', function () { if (!closed) { try { peer.reconnect(); } catch (x) { /* ignore */ } } });
+    Net.transport = {
+      kind: 'peer',
+      send: function (m) { if (conn && conn.open) conn.send(Object.assign({ clientId: Net.me }, m)); else toast('Not connected to the host right now.', 'bad'); },
+      close: function () { closed = true; clearTimeout(retryT); try { peer.destroy(); } catch (x) { /* ignore */ } }
+    };
+    connect();
+    const watch = setInterval(function () { if (ever) { clearInterval(watch); res(); } }, 100);
+    setTimeout(function () {
+      if (!ever && !closed) {
+        clearInterval(watch);
+        closed = true;
+        try { peer.destroy(); } catch (x) { /* ignore */ }
+        rej(new Error('Could not reach room ' + code + '. Check the code, and make sure the host has the page open.'));
+      }
+    }, 15000);
+  });
+}
+function dbErrorText(e) {
+  const c = e && e.code;
+  if (c === 'invalid_argument') return 'Your friend needs edit access to this page to play online.';
+  if (c === 'quota_exceeded') return 'Storage for this page is full.';
+  if (c === 'resource_exhausted') return 'Too many moves at once. Wait a moment.';
+  if (c === 'revoked') return 'Online access to this page was withdrawn.';
+  return 'Could not reach the game server. Try again.';
+}
+function makeWriter(ref) {
+  let busy = false;
+  let next = null;
+  let tries = 0;
+  async function pump() {
+    if (busy || !next) return;
+    busy = true;
+    const body = next;
+    next = null;
+    try { await ref.set(body); tries = 0; }
+    catch (e) {
+      if (e && e.code === 'unavailable' && tries < 3) { tries++; await sleep(500 + rnd(700)); if (!next) next = body; }
+      else { tries = 0; toast(dbErrorText(e), 'bad'); }
+    }
+    busy = false;
+    pump();
+  }
+  return { push: function (body) { next = body; pump(); } };
+}
+async function initCloud() {
+  try {
+    const both = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    ONLINE.db = both[0];
+    ONLINE.user = both[1];
+    let id = null;
+    if (ONLINE.user) id = await ONLINE.user.id();
+    if (ONLINE.db && id) { ONLINE.env = 'cloud'; Net.me = id; loadResumable(); }
+    else ONLINE.env = 'cloud-off';
+  } catch (e) { ONLINE.env = 'cloud-off'; }
+  refreshOnlineCard();
+}
+async function loadResumable() {
+  try {
+    const q = await ONLINE.db.collection('games').where('hostId', '==', Net.me).get();
+    ONLINE.resume = q.docs.map(function (d) { return { code: d.id, data: d.data() }; }).filter(function (x) {
+      return x.data && x.data.s && x.data.status !== 'over' && Date.now() - (x.data.updated || 0) < 3 * 86400000;
+    }).sort(function (a, b) { return (b.data.updated || 0) - (a.data.updated || 0); }).slice(0, 3);
+  } catch (e) { ONLINE.resume = []; }
+  refreshOnlineCard();
+}
+function processInbox(data) {
+  if (!data || !S) return;
+  const cid = String(data.client || '');
+  if (!cid || !Array.isArray(data.msgs)) return;
+  const msgs = data.msgs.filter(function (m) { return m && typeof m.n === 'number'; }).sort(function (a, b) { return a.n - b.n; });
+  let changed = false;
+  msgs.forEach(function (m) {
+    let ack = 0;
+    if (S.acks && S.acks[cid]) ack = S.acks[cid];
+    if (m.n <= ack) return;
+    S.acks = Object.assign({}, S.acks);
+    S.acks[cid] = m.n;
+    changed = true;
+    hostReceive(cid, clone(m));
+  });
+  if (changed && Net.transport) Net.transport.publish();
+}
+async function cloudHost(name, settings, resume) {
+  const db = ONLINE.db;
+  let code = '';
+  if (resume) code = resume.code;
+  else {
+    for (let i = 0; i < 5; i++) {
+      code = genCode();
+      const s = await db.doc('games/' + code).get();
+      if (!s.exists) break;
+    }
+  }
+  const ref = db.doc('games/' + code);
+  const w = makeWriter(ref);
+  let unsub = null;
+  Net.transport = { kind: 'cloud', publish: function () { if (S) w.push({ hostId: Net.me, status: S.status, updated: Date.now(), s: S }); }, close: function () { if (unsub) unsub(); } };
+  Net.code = code;
+  Net.mode = 'host';
+  Net.kind = 'online';
+  resetUI();
+  if (resume) setState(clone(resume.s));
+  else setState(lobbyState(name, settings));
+  Net.transport.publish();
+  unsub = db.collection('games/' + code + '/inbox').onSnapshot(function (snap) {
+    snap.docs.forEach(function (d) { processInbox(d.data()); });
+  }, function (e) { toast(dbErrorText(e), 'bad'); });
+}
+async function cloudJoin(code, name) {
+  const db = ONLINE.db;
+  const ref = db.doc('games/' + code);
+  const snap = await ref.get();
+  if (!snap.exists || !snap.data() || !snap.data().s) throw new Error('There is no room called ' + code + '. Check the code with your host.');
+  const inRef = db.doc('games/' + code + '/inbox/' + Net.me);
+  const mine = await inRef.get();
+  let msgs = [];
+  if (mine.exists && mine.data() && Array.isArray(mine.data().msgs)) msgs = clone(mine.data().msgs);
+  let seq = 0;
+  msgs.forEach(function (m) { if (m.n > seq) seq = m.n; });
+  const first = clone(snap.data());
+  const acks = first.s.acks || {};
+  if ((acks[Net.me] || 0) > seq) seq = acks[Net.me];
+  const w = makeWriter(inRef);
+  let unsub = null;
+  Net.mode = 'guest';
+  Net.kind = 'online';
+  Net.code = code;
+  Net.transport = {
+    kind: 'cloud',
+    send: function (m) { seq++; msgs.push(Object.assign({}, m, { n: seq })); msgs = msgs.slice(-12); w.push({ client: Net.me, msgs: msgs }); return seq; },
+    close: function () { if (unsub) unsub(); }
+  };
+  resetUI();
+  setState(first.s);
+  unsub = ref.onSnapshot(function (s) { if (!s.exists) return; const d = s.data(); if (d && d.s) setState(clone(d.s)); }, function (e) { toast(dbErrorText(e), 'bad'); });
+  Net.transport.send({ type: 'hello', name: name });
+  saveLocal('cs-last-room', code);
+}
+
+/* ---------- Starting games ---------- */
+
+function myName() {
+  const el = document.getElementById('my-name');
+  let v = '';
+  if (el) v = el.value;
+  const n = cleanName(v, 'Delegate');
+  savePrefs({ name: n });
+  return n;
+}
+function startPractice() {
+  const name = myName();
+  const n = Number(document.getElementById('pr-blocs').value);
+  const bloc = document.getElementById('pr-bloc').value;
+  const diff = document.getElementById('pr-diff').value;
+  const coach = document.getElementById('pr-coach').checked;
+  savePrefs({ blocs: n, bloc: bloc, diff: diff, coach: coach });
+  const set = BLOC_SETS[n];
+  let mine = set.indexOf(bloc);
+  if (mine < 0) mine = 0;
+  const names = ['Ines', 'Kofi', 'Mei', 'Lars'];
+  const players = [];
+  let b = 0;
+  for (let i = 0; i < n; i++) {
+    if (i === mine) players.push({ name: name, kind: 'human', level: '', client: 'me' });
+    else { players.push({ name: names[b], kind: 'bot', level: 'normal', client: '' }); b++; }
+  }
+  leaveSession();
+  Net.mode = 'local';
+  Net.kind = 'practice';
+  resetUI();
+  setState(newGame(players, { diff: diff, coach: coach, bloc: bloc }, null));
+}
+function readHsNames() {
+  const out = [];
+  document.querySelectorAll('[data-hs]').forEach(function (el) { out.push(el.value); });
+  if (out.length) UI.hsNames = out;
+}
+function startHotseat() {
+  readHsNames();
+  const diff = document.getElementById('hs-diff').value;
+  savePrefs({ hsNames: UI.hsNames, hsDiff: diff });
+  const players = UI.hsNames.map(function (n, i) { return { name: cleanName(n, 'Delegate ' + (i + 1)), kind: 'human', level: '', client: 'p' + i }; });
+  leaveSession();
+  Net.mode = 'local';
+  Net.kind = 'hotseat';
+  resetUI();
+  setState(newGame(players, { diff: diff, coach: false }, null));
+}
+function onlineSettings() {
+  const el = document.getElementById('on-diff');
+  let diff = 'standard';
+  if (el) diff = el.value;
+  return { diff: diff, coach: false };
+}
+function failOnline(e) {
+  leaveSession();
+  UI.screen = 'home';
+  UI.built = '';
+  render();
+  let msg = 'Something went wrong.';
+  if (e && e.type) msg = peerErrorText(e);
+  else if (e && e.message) msg = e.message;
+  toast(msg, 'bad');
+}
+async function onlineCreate() {
+  const name = myName();
+  const settings = onlineSettings();
+  if (ONLINE.env === 'peer') Net.me = localId();
+  UI.joining = 'Opening a room…';
+  UI.screen = 'joining';
+  render();
+  try {
+    if (ONLINE.env === 'cloud') await cloudHost(name, settings, null);
+    else await peerHost(name, settings, null);
+  } catch (e) { failOnline(e); }
+}
+async function onlineJoin() {
+  const name = myName();
+  const el = document.getElementById('on-code');
+  const code = String((el && el.value) || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (code.length !== 5) { toast('Room codes have 5 characters.', 'bad'); return; }
+  if (ONLINE.env === 'peer') Net.me = localId();
+  saveLocal('cs-last-room', code);
+  UI.joining = 'Joining room ' + code + '…';
+  UI.screen = 'joining';
+  render();
+  try {
+    if (ONLINE.env === 'cloud') await cloudJoin(code, name);
+    else await peerJoin(code, name);
+  } catch (e) { failOnline(e); }
+}
+async function onlineResume(code) {
+  const name = myName();
+  UI.joining = 'Reopening room ' + code + '…';
+  UI.screen = 'joining';
+  render();
+  try {
+    if (ONLINE.env === 'cloud') {
+      const r = ONLINE.resume.find(function (x) { return x.code === code; });
+      if (!r) throw new Error('That room is no longer available.');
+      await cloudHost(name, onlineSettings(), { code: code, s: r.data.s });
+    } else {
+      Net.me = localId();
+      const saved = JSON.parse(loadLocal('cs-host') || 'null');
+      if (!saved || saved.code !== code) throw new Error('That room is no longer saved here.');
+      await peerHost(name, onlineSettings(), saved);
+    }
+  } catch (e) { failOnline(e); }
+}
+function leaveSession() {
+  if (Net.transport && Net.transport.close) Net.transport.close();
+  Net.transport = null;
+  Net.mode = 'local';
+  Net.kind = '';
+  Net.code = '';
+  S = null;
+  clearTimeout(botTimer);
+  botKey = '';
+}
+function leaveGame() {
+  leaveSession();
+  UI.screen = 'home';
+  UI.built = '';
+  UI.confirmLeave = false;
+  render();
+  if (ONLINE.env === 'cloud') loadResumable();
+}
+
+/* ---------- Rendering ---------- */
+
+const $ = function (s) { return document.querySelector(s); };
+let toastTimer = 0;
+function toast(msg, kind) {
+  const el = $('#toast');
+  el.textContent = msg;
+  let cls = 'show';
+  if (kind) cls += ' ' + kind;
+  el.className = cls;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.className = ''; }, 3400);
+}
+function opt(value, label, sel) {
+  let s = '';
+  if (String(value) === String(sel)) s = ' selected';
+  return '<option value="' + esc(value) + '"' + s + '>' + esc(label) + '</option>';
+}
+function tagChip(t) { return '<span class="tg" style="background:' + TAGS[t][1] + '">' + TAGS[t][0] + '</span>'; }
+function actText(card) {
+  const a = card.act;
+  const t = TAGS[a.tag][0];
+  let s = '';
+  if (a.kind === 'clean' || a.kind === 'cleanfree') s = 'Add 1 Clean Energy';
+  else if (a.kind === 'phase') s = 'Remove 1 Dirty Energy';
+  else if (a.kind === 'cut') s = 'Remove 1 ' + EMI_NAME[a.arg] + ' Emission';
+  else if (a.kind === 'elec') s = 'Remove 1 ' + EMI_NAME[a.arg] + ' Emission, adding 1 Energy Demand each,';
+  else if (a.kind === 'res') { if (a.arg === 'any') s = 'Gain 1 Resilience of any type'; else s = 'Gain 1 ' + RES_NAME[a.arg] + ' Resilience'; }
+  else if (a.kind === 'draw') s = 'Draw 1 card';
+  else if (a.kind === 'tree') s = 'Add 1 Tree';
+  else if (a.kind === 'ocean') s = 'Add 1 Ocean';
+  else if (a.kind === 'dac') s = 'Add 1 Direct Air Capture';
+  else if (a.kind === 'eff') s = 'Reduce Energy Demand by 1';
+  else if (a.kind === 'aid') s = 'Give another bloc 1 Clean Energy';
+  else if (a.kind === 'aidres') s = 'Give another bloc 1 Resilience';
+  else if (a.kind === 'relief') s = 'Remove 1 Community in Crisis';
+  else if (a.kind === 'geo') s = 'Remove 2 Carbon from the Thermometer';
+  s += ' per ' + t + ' tag in this stack.';
+  if (a.kind === 'geo') s += ' Then roll: on a 1, add 2 Communities in Crisis.';
+  if (a.cost) s = 'Discard ' + plural(a.cost, 'card') + ': ' + s;
+  return s;
+}
+function cardHTML(id, o) {
+  o = o || {};
+  const c = CARDS[id];
+  let cls = 'card';
+  if (o.cls) cls += ' ' + o.cls;
+  let tag = 'div';
+  let attrs = '';
+  if (o.button) { tag = 'button'; attrs = ' type="button" data-hand="' + id + '"'; }
+  let limit = '';
+  if (c.act.once) limit = 'Once per round';
+  if (c.act.multi) limit += ' · Not in solo';
+  let bloc = '';
+  if (c.bloc) bloc = '<span class="cbloc">' + esc(BLOCS[c.bloc].name) + ' starting card</span>';
+  return '<' + tag + ' class="' + cls + '"' + attrs + ' aria-label="' + esc(c.title) + '"><span class="ct">' + esc(c.title) + '</span><span class="tags">' + c.tags.map(tagChip).join('') + '</span><span class="ca">' + esc(actText(c)) + '</span><span class="cl">' + limit + '</span>' + bloc + (o.extra || '') + '</' + tag + '>';
+}
+function render() {
+  renderTop();
+  const scr = $('#screen');
+  let keep = 0;
+  const ch = $('.chron');
+  if (ch) keep = ch.scrollTop;
+  if (UI.screen === 'home') {
+    if (UI.built !== 'home') { renderHome(); UI.built = 'home'; }
+  } else if (UI.screen === 'joining') {
+    scr.innerHTML = '<section class="panel" style="max-width:520px"><h2>One Moment</h2><p>' + esc(UI.joining) + '</p></section>';
+    UI.built = 'joining';
+  } else if (UI.screen === 'lobby') {
+    renderLobby();
+    UI.built = 'lobby';
+  } else if (UI.screen === 'game' && S) {
+    renderGame();
+    UI.built = 'game';
+  }
+  const ch2 = $('.chron');
+  if (ch2 && keep) ch2.scrollTop = keep;
+  renderCover();
+}
+function renderTop() {
+  let h = '';
+  if (UI.screen === 'lobby' || UI.screen === 'game') {
+    if (Net.code) h += '<span class="chip">Room ' + esc(Net.code) + '</span>';
+    else if (Net.kind === 'practice') h += '<span class="chip">Practice</span>';
+    else if (Net.kind === 'hotseat') h += '<span class="chip">Pass And Play</span>';
+    if (Net.mode === 'guest' && !UI.conn) h += '<span class="chip warn">Reconnecting</span>';
+  }
+  h += '<button class="btn ghost small" type="button" data-act="rules">Rules</button>';
+  if (UI.screen !== 'home') {
+    let lbl = 'Leave';
+    if (UI.confirmLeave) lbl = 'Tap again to leave';
+    h += '<button class="btn ghost small" type="button" data-act="leave-ask">' + lbl + '</button>';
+  }
+  $('#topRight').innerHTML = h;
+}
+function renderHome() {
+  const pr = loadPrefs();
+  const name = pr.name || '';
+  let coach = ' checked';
+  if (pr.coach === false) coach = '';
+  if (!UI.hsNames.length) {
+    if (Array.isArray(pr.hsNames) && pr.hsNames.length >= 2) UI.hsNames = pr.hsNames.slice(0, 4);
+    else UI.hsNames = ['Delegate 1', 'Delegate 2'];
+  }
+  let blocOpts = '';
+  for (let i = 1; i <= 4; i++) { let l = i + ' blocs with bot teammates'; if (i === 1) l = '1 bloc (solo rules)'; blocOpts += opt(i, l, pr.blocs || 2); }
+  let blocPick = '';
+  Object.keys(BLOCS).forEach(function (k) { blocPick += opt(k, BLOCS[k].name, pr.bloc || 'eastern'); });
+  let diffOpts = '';
+  Object.keys(DIFFS).forEach(function (k) { diffOpts += opt(k, DIFFS[k].label, pr.diff || 'standard'); });
+  let hsDiff = '';
+  Object.keys(DIFFS).forEach(function (k) { hsDiff += opt(k, DIFFS[k].label, pr.hsDiff || 'standard'); });
+  $('#screen').innerHTML =
+    '<section class="hero"><div><h1>Common Sky</h1>' +
+    '<p class="lede">A cooperative climate game for 1 to 4 players. Each of you leads a world bloc. Build stacks of projects to cut emissions, keep the lights on and protect your communities, and reach drawdown before round 6 ends.</p>' +
+    '<p class="lede">Win or lose together. Practise with bot teammates, share one screen, or open a room for friends online.</p></div>' +
+    '<div class="panel"><span class="eyebrow">An example stack</span><div class="stacks"><div class="stack"><div class="strip"><span class="ct">Microgrids</span><span class="tags">' + tagChip('grid') + '</span></div>' + cardHTML(CARDS.findIndex(function (c) { return c.title === 'Utility Solar Parks'; })) + '</div></div><p class="note">Cards tucked behind lend their tags to the card in front. This Utility Solar Parks card counts 1 Solar tag, but its stack also holds a Grid card. Play a Solar card behind it to double its output.</p></div></section>' +
+    '<div class="namebar"><div class="field"><label for="my-name">Your Name</label><input type="text" id="my-name" maxlength="18" autocomplete="nickname" placeholder="Delegate" value="' + esc(name) + '"></div></div>' +
+    '<section class="modes">' +
+      '<article class="mode"><h2>Practice</h2><p>Lead one bloc with bot teammates for the others. The coach can suggest your next move.</p>' +
+        '<div class="field"><label for="pr-blocs">Table</label><select id="pr-blocs">' + blocOpts + '</select></div>' +
+        '<div class="row"><div class="field"><label for="pr-bloc">Your Bloc</label><select id="pr-bloc">' + blocPick + '</select></div><div class="field"><label for="pr-diff">Difficulty</label><select id="pr-diff">' + diffOpts + '</select></div></div>' +
+        '<p class="note">Two blocs use Eastern and Northern. Three use Southern, Atlantic and Northern. Your bloc must be in the table you choose.</p>' +
+        '<label class="check"><input type="checkbox" id="pr-coach"' + coach + '> Coach and a Hint button</label>' +
+        '<button class="btn" type="button" data-act="practice-start">Start Practice</button></article>' +
+      '<article class="mode"><h2>Pass And Play</h2><p>Share one screen. Each delegate plays their bloc’s projects in turn during the Local stage.</p><div class="hs-list" id="hs-list"></div><div class="field"><label for="hs-diff">Difficulty</label><select id="hs-diff">' + hsDiff + '</select></div><button class="btn" type="button" data-act="hotseat-start">Start Game</button></article>' +
+      '<article class="mode" id="online-card"></article>' +
+    '</section>' +
+    '<section class="primer"><div><h2>How A Round Works</h2><ol class="steps">' +
+      '<li><p><b>Global stage.</b> Crisis cards are drawn: one is forecast face up, the rest stay hidden. The table picks a Global Project to work towards together.</p></li>' +
+      '<li><p><b>Local stage.</b> Everyone draws 5 cards and plays at the same time. Start projects, tuck cards behind stacks to boost them, take each front card’s action, help Global Projects, or tuck cards under the forecast crisis to stop it.</p></li>' +
+      '<li><p><b>Emissions stage.</b> Unmet Energy Demand puts communities in crisis. Every Dirty Energy and Emissions token is 1 Carbon. Trees, Oceans and capture absorb what they can, and the rest heats the Thermometer.</p></li>' +
+      '<li><p><b>Crisis stage.</b> Roll the planetary die once per Temperature Band to edge towards tipping points, then resolve every Crisis card. Resilience reduces their effects.</p></li>' +
+      '<li><p><b>Growth stage.</b> If you reached drawdown and survived, you win. Otherwise Energy Demand grows and the next round begins.</p></li>' +
+    '</ol></div><div class="panel"><h3>Win And Lose</h3><p><b>Win</b> by reaching drawdown, where the planet absorbs more than you emit, then surviving that round’s crises.</p><p><b>Lose</b> if the Thermometer reaches 2.0°C (8 bands), any bloc has 12 Communities in Crisis, or round 6 ends without drawdown.</p></div></section>';
+  renderHsNames();
+  refreshOnlineCard();
+  const m = /^#join-([A-Za-z0-9]{5})$/.exec(location.hash || '');
+  if (m) { const c = document.getElementById('on-code'); if (c) c.value = m[1].toUpperCase(); }
+}
+function renderHsNames() {
+  const box = document.getElementById('hs-list');
+  if (!box) return;
+  let h = '<span class="label">Delegates</span>';
+  UI.hsNames.forEach(function (n, i) {
+    h += '<div class="hs-item"><input type="text" data-hs="' + i + '" id="hs-' + i + '" maxlength="18" aria-label="Delegate ' + (i + 1) + ' name" value="' + esc(n) + '">';
+    if (UI.hsNames.length > 2) h += '<button class="btn ghost small" type="button" data-act="hs-remove" data-i="' + i + '" aria-label="Remove delegate ' + (i + 1) + '">Remove</button>';
+    h += '</div>';
+  });
+  if (UI.hsNames.length < 4) h += '<button class="btn ghost small" type="button" data-act="hs-add" style="justify-self:start">Add Delegate</button>';
+  box.innerHTML = h;
+}
+function refreshOnlineCard() {
+  const card = document.getElementById('online-card');
+  if (!card) return;
+  const env = ONLINE.env;
+  let h = '<h2>Play Online</h2>';
+  if (env === 'cloud-pending') { card.innerHTML = h + '<p>Checking whether online rooms are available on this page…</p>'; return; }
+  if (env === 'cloud-off') { card.innerHTML = h + '<p>Online rooms need you to be signed in to Claude, with edit access to this page.</p>'; return; }
+  if (env === 'cloud') h += '<p>Share this page with your friends as Editors. One of you creates a room, the others join with its code.</p>';
+  else h += '<p>Everyone opens this page. One person creates a room and shares the code, the others join with it. Bots can fill empty blocs.</p>';
+  let diff = '';
+  Object.keys(DIFFS).forEach(function (k) { diff += opt(k, DIFFS[k].label, 'standard'); });
+  h += '<div class="field"><label for="on-diff">Difficulty</label><select id="on-diff">' + diff + '</select></div>';
+  h += '<button class="btn" type="button" data-act="online-create">Create Room</button>';
+  const last = loadLocal('cs-last-room') || '';
+  h += '<div class="row"><div class="field"><label for="on-code">Room Code</label><input type="text" id="on-code" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCDE" value="' + esc(last) + '"></div><button class="btn ghost" type="button" data-act="online-join">Join</button></div>';
+  let resume = [];
+  if (env === 'cloud') resume = ONLINE.resume.map(function (r) { return r.code; });
+  else {
+    try {
+      const saved = JSON.parse(loadLocal('cs-host') || 'null');
+      if (saved && saved.s && saved.s.status !== 'over' && Date.now() - saved.at < 86400000) resume = [saved.code];
+    } catch (e) { resume = []; }
+  }
+  if (resume.length) {
+    h += '<div class="field"><span class="label">Rooms You Host</span><div class="resume">';
+    resume.forEach(function (c) { h += '<button class="btn ghost small" type="button" data-act="resume" data-code="' + esc(c) + '">Reopen ' + esc(c) + '</button>'; });
+    h += '</div></div>';
+  }
+  if (env === 'peer') h += '<p class="note">Connects browsers directly through the free PeerJS service. The host keeps the page open while you play.</p>';
+  card.innerHTML = h;
+}
+function renderLobby() {
+  const host = Net.mode === 'host';
+  let seats = '';
+  const set = BLOC_SETS[S.players.length];
+  S.players.forEach(function (p, i) {
+    let tags = '';
+    if (i === 0) tags += '<span class="tag">Host</span> ';
+    if (p.client && p.client === Net.me) tags += '<span class="tag">You</span> ';
+    if (p.kind === 'bot') tags += '<span class="tag">Bot</span> ';
+    let rm = '';
+    if (host && i > 0) rm = '<button class="btn ghost small" type="button" data-act="remove-player" data-i="' + i + '">Remove</button>';
+    let bloc = '';
+    if (set) bloc = ' <span class="note">· ' + esc(BLOCS[set[i]].name) + '</span>';
+    seats += '<li><span>' + esc(p.name) + bloc + '</span><span>' + tags + rm + '</span></li>';
+  });
+  let invite;
+  if (Net.transport && Net.transport.kind === 'peer') {
+    if (/^https?:$/.test(location.protocol)) invite = 'Send your friends the invite link, or have them open this page and enter the code.';
+    else invite = 'Your friends open the same file, choose Play Online and enter this code.';
+  } else invite = 'Your friends open this page in Claude, choose Play Online and enter this code.';
+  let right = '<div class="panel"><h2>Delegates (' + S.players.length + ' of 4)</h2><ol class="seats">' + seats + '</ol><p class="note">Difficulty: ' + esc(DIFFS[S.settings.diff || 'standard'].label) + '.</p>';
+  if (host) {
+    let disAdd = '';
+    if (S.players.length >= 4) disAdd = ' disabled';
+    let disStart = '';
+    if (S.players.length < 2) disStart = ' disabled';
+    right += '<div class="row"><button class="btn ghost" type="button" data-act="add-bot"' + disAdd + '>Add Bot Teammate</button><button class="btn" type="button" data-act="start"' + disStart + '>Start The Summit</button></div>';
+  } else right += '<p class="muted">Waiting for the host to start.</p>';
+  right += '</div>';
+  $('#screen').innerHTML = '<section class="lobby"><div class="panel"><span class="eyebrow">Room Code</span><div class="code">' + esc(Net.code) + '</div><p>' + invite + '</p><button class="btn ghost" type="button" data-act="copy-code">Copy Invite</button></div>' + right + '</section>';
+}
+function projected(st) {
+  let e = st.carry;
+  st.players.forEach(function (p) { e += carbonOf(st, p); });
+  return e;
+}
+function dashHTML(st) {
+  let rounds = '';
+  for (let r = 1; r <= ROUNDS; r++) {
+    let c = '';
+    if (r === st.round) c = 'now';
+    else if (r < st.round) c = 'past';
+    rounds += '<span class="' + c + '">' + r + '</span>';
+  }
+  let thermo = '';
+  for (let b = 0; b < MAX_BANDS; b++) {
+    if (b < st.therm.bands) thermo += '<i class="on"><span style="width:100%"></span></i>';
+    else if (b === st.therm.bands) thermo += '<i><span style="width:' + Math.round(st.therm.cubes / rowSize(st) * 100) + '%"></span></i>';
+    else thermo += '<i></i>';
+  }
+  const emit = projected(st);
+  const cap = capacity(st);
+  let net = '<b style="color:var(--heat)">+' + (emit - cap) + '</b><span class="note">to Thermometer</span>';
+  if (emit < cap) net = '<b style="color:var(--leaf)">Drawdown</b><span class="note">' + (cap - emit) + ' spare</span>';
+  let planet = '';
+  PLANET.forEach(function (pl) {
+    let cells = '';
+    for (let i = 1; i <= 5; i++) {
+      let c = '';
+      if (TIPPING.indexOf(i) >= 0) c += ' tip';
+      if (st.tracks[pl[0]] >= i) c += ' on';
+      cells += '<i class="' + c.trim() + '"></i>';
+    }
+    planet += '<div class="prow" title="' + esc(pl[2]) + '"><span>' + esc(pl[1]) + '</span><span class="pcells">' + cells + '</span></div>';
+  });
+  return '<section class="dash">' +
+    '<div class="panel"><div class="row" style="justify-content:space-between;align-items:center"><div><span class="eyebrow">Round</span><div class="rounds">' + rounds + '</div></div><div style="text-align:right"><span class="eyebrow">Warming</span><span class="big">' + degrees(st.therm.bands) + '°C</span></div></div>' +
+    '<div><span class="eyebrow">Thermometer: ' + st.therm.bands + ' of 8 bands, ' + st.therm.cubes + ' of ' + rowSize(st) + ' toward the next</span><div class="thermo">' + thermo + '</div></div></div>' +
+    '<div class="panel"><span class="eyebrow">Carbon outlook if the round ended now</span><div class="outlook"><div><b>' + emit + '</b><span class="note">emitted</span></div><div><b>' + cap + '</b><span class="note">absorbed</span></div><div>' + net + '</div></div>' +
+    '<div class="outlook"><div><b>' + st.trees + '</b><span class="note">Trees</span></div><div><b>' + st.oceans + '</b><span class="note">Oceans</span></div><div><b>' + st.dac + '</b><span class="note">Air capture</span></div></div></div>' +
+    '<div class="panel"><span class="eyebrow">Planetary tipping points (red squares trigger)</span><div class="planet">' + planet + '</div></div>' +
+    '</section>';
+}
+function crisisHTML(st, me) {
+  let h = '';
+  st.crises.forEach(function (c, ci) {
+    if (!c.face) { h += '<div class="ccard unknown"><h4>Unknown Crisis</h4><p class="note">Revealed in the Crisis stage.</p></div>'; return; }
+    const cr = CRISES[c.id];
+    let amt = String(cr.amt);
+    if (cr.amt === 'bands') amt = 'one per Temperature Band';
+    if (cr.amt === 'halfbands') amt = 'one per two Temperature Bands';
+    let target = 'Every bloc';
+    if (cr.target !== 'all') {
+      const parts = cr.target.split(':');
+      const names = { carbon: 'highest Carbon', dirty: 'most Dirty Energy', cic: 'most Communities in Crisis', social: 'lowest Social Resilience', eco: 'lowest Ecological Resilience', infra: 'lowest Infrastructure Resilience' };
+      target = 'The bloc with the ' + names[parts[1]];
+    }
+    const effNames = { cic: 'gains Communities in Crisis', demand: 'adds Energy Demand', cards: 'loses cards from hand', dirty: 'adds Dirty Energy', drawminus: 'draws fewer cards next round', trees: 'loses Trees', oceans: 'loses Oceans' };
+    const parts = cr.eff.split(':');
+    let eff = effNames[parts[0]];
+    if (parts[0] === 'loseres') eff = 'loses ' + RES_NAME[parts[1]] + ' Resilience';
+    let red = '';
+    if (cr.reduce) red = ' Reduced by ' + RES_NAME[cr.reduce] + ' Resilience.';
+    const have = tagCount(c.tucked, cr.ignore);
+    h += '<div class="ccard"><span class="eyebrow">Forecast crisis</span><h4>' + esc(cr.title) + '</h4><p>' + esc(target + ' ' + eff + ': ' + amt + '.' + red) + '</p><p class="note">Stop it entirely by tucking ' + ignoreNeed(st) + ' ' + TAGS[cr.ignore][0] + ' tags under it: ' + have + ' of ' + ignoreNeed(st) + ' so far.</p></div>';
+  });
+  if (!h) h = '<p class="note">No crises drawn yet.</p>';
+  return '<div class="panel"><h3>Crises This Round</h3><div class="ccards">' + h + '</div></div>';
+}
+function globalsHTML(st, me) {
+  let h = '';
+  if (st.phase === 'global' && st.status === 'playing') {
+    let offers = '';
+    st.offer.forEach(function (gid, i) {
+      const g = GLOBALS[gid];
+      offers += '<div class="gcard"><span class="eyebrow">Offered · needs ' + globalReq(st) + ' ' + TAGS[g.tag][0] + ' tags</span><h4>' + esc(g.title) + '</h4><p>' + esc(g.text) + '</p><button class="btn small" type="button" data-act="pick-global" data-i="' + i + '">Choose This Project</button></div>';
+    });
+    let rep = '';
+    if (st.globals.length >= 4) {
+      rep = '<p class="note">Four projects are already in play. Pick one to replace first:</p><div class="choices">';
+      st.globals.forEach(function (g, i) { let on = ''; if (UI.replace === i) on = ' style="border-color:var(--dawn)"'; rep += '<button class="btn ghost small" type="button" data-act="replace" data-i="' + i + '"' + on + '>' + esc(GLOBALS[g.id].title) + '</button>'; });
+      rep += '</div>';
+    }
+    h += '<div class="panel" style="border-color:var(--dawn)"><h3>Global Summit: Choose A Project</h3>' + rep + '<div class="gcards">' + offers + '</div><div class="row"><button class="btn ghost small" type="button" data-act="pick-global" data-i="-1">Start No New Project</button></div></div>';
+  }
+  let cards = '';
+  st.globals.forEach(function (g) {
+    const gl = GLOBALS[g.id];
+    const have = tagCount(g.tucked, gl.tag);
+    const need = globalReq(st);
+    let cls = 'gcard';
+    let status = have + ' of ' + need + ' ' + TAGS[gl.tag][0] + ' tags';
+    if (g.active) { cls += ' active'; status = 'Active'; }
+    cards += '<div class="' + cls + '"><span class="eyebrow">' + status + '</span><h4>' + esc(gl.title) + '</h4><p>' + esc(gl.text) + '</p><div class="bar"><span style="width:' + Math.min(100, Math.round(have / need * 100)) + '%"></span></div></div>';
+  });
+  if (!cards) cards = '<p class="note">No Global Projects yet.</p>';
+  h += '<div class="panel"><h3>Global Projects (' + st.globals.length + ' of 4)</h3><div class="gcards">' + cards + '</div></div>';
+  return h;
+}
+function energyHTML(p) {
+  const total = Math.max(p.demand, p.dirty + p.clean, 1);
+  const short = shortfall(p);
+  let warn = '';
+  if (short) warn = '<span class="warn-text">' + short + ' short of demand</span>';
+  return '<div class="stat"><span class="eyebrow">Energy</span><div class="energy"><span class="d" style="width:' + (p.dirty / total * 100) + '%"></span><span class="c" style="width:' + (p.clean / total * 100) + '%"></span><span class="m" style="left:calc(' + (p.demand / total * 100) + '% - 2px)"></span></div><div class="kv"><span>Dirty</span><b>' + p.dirty + '</b></div><div class="kv"><span>Clean</span><b>' + p.clean + '</b></div><div class="kv"><span>Demand</span><b>' + p.demand + '</b></div>' + warn + '</div>';
+}
+function emisHTML(st, p) {
+  let rows = '';
+  EMIS.forEach(function (e) { if (p.emis[e]) rows += '<div class="kv"><span>' + EMI_NAME[e] + '</span><b>' + p.emis[e] + '</b></div>'; });
+  if (!rows) rows = '<p class="note">No emissions tokens left.</p>';
+  return '<div class="stat"><span class="eyebrow">Carbon per round: ' + carbonOf(st, p) + '</span>' + rows + '</div>';
+}
+function resHTML(st, p) {
+  let rows = '';
+  RES.forEach(function (r) { rows += '<div class="kv"><span>' + RES_NAME[r] + '</span><b>' + p.res[r] + '</b></div>'; });
+  return '<div class="stat"><span class="eyebrow">Resilience</span>' + rows + '<p class="note">Aim for ' + Math.max(1, st.therm.bands) + ' of each.</p></div>';
+}
+function cicHTML(p) {
+  let cells = '';
+  for (let i = 1; i <= 12; i++) {
+    let c = '';
+    if (i <= p.cic) c = 'on';
+    if (i === 4 || i === 8 || i === 12) c += ' th';
+    cells += '<i class="' + c.trim() + '"></i>';
+  }
+  let note = 'Draw 5 cards next round.';
+  if (p.cic >= 8) note = 'Drawing 2 fewer cards.';
+  else if (p.cic >= 4) note = 'Drawing 1 fewer card.';
+  return '<div class="stat"><span class="eyebrow">Communities in Crisis: ' + p.cic + ' of 12</span><div class="cic">' + cells + '</div><p class="note">' + note + ' At 12 everyone loses.</p></div>';
+}
+function stackHTML(st, seat, si, interactive) {
+  const p = st.players[seat];
+  const stack = p.stacks[si];
+  const front = stack[stack.length - 1];
+  let strips = '';
+  for (let i = 0; i < stack.length - 1; i++) {
+    const c = CARDS[stack[i]];
+    strips += '<div class="strip"><span class="ct">' + esc(c.title) + '</span><span class="tags">' + c.tags.map(tagChip).join('') + '</span></div>';
+  }
+  const act = CARDS[front].act;
+  const n = tagCount(stack, act.tag);
+  let foot = '';
+  if (interactive) {
+    let btn;
+    if (act.multi && st.players.length < 2) btn = '<span class="note">Not used in solo.</span>';
+    else if (act.once && p.used[front]) btn = '<span class="note">Used this round.</span>';
+    else if (n <= 0) btn = '<span class="note">Needs a ' + TAGS[act.tag][0] + ' tag.</span>';
+    else if (p.hand.length < act.cost) btn = '<span class="note">Needs ' + plural(act.cost, 'card') + ' to discard.</span>';
+    else btn = '<button class="btn small green" type="button" data-act="take" data-i="' + si + '">Use</button>';
+    foot = '<div class="stack-foot"><span class="amt">' + n + ' ' + TAGS[act.tag][0] + ' in stack: ' + amountText(act, n) + '</span>' + btn + '</div>';
+  }
+  return '<div class="stack">' + strips + cardHTML(front) + foot + '</div>';
+}
+function amountText(act, n) {
+  const k = act.kind;
+  if (k === 'clean' || k === 'cleanfree') return '+' + n + ' Clean';
+  if (k === 'phase') return '−' + n + ' Dirty';
+  if (k === 'cut') return '−' + n + ' ' + EMI_NAME[act.arg];
+  if (k === 'elec') return '−' + n + ' ' + EMI_NAME[act.arg] + ', +Demand';
+  if (k === 'res') return '+' + n + ' Resilience';
+  if (k === 'draw') return 'Draw ' + n;
+  if (k === 'tree') return '+' + n + ' Trees';
+  if (k === 'ocean') return '+' + n + ' Oceans';
+  if (k === 'dac') return '+' + n + ' Capture';
+  if (k === 'eff') return '−' + n + ' Demand';
+  if (k === 'aid') return 'Give ' + n + ' Clean';
+  if (k === 'aidres') return 'Give ' + n + ' Resilience';
+  if (k === 'relief') return '−' + n + ' Crisis';
+  return '−' + (2 * n) + ' Thermometer';
+}
+function selectedHTML(st, me) {
+  const p = st.players[me];
+  const id = UI.sel;
+  const c = CARDS[id];
+  let h = '<div class="panel" style="border-color:var(--dawn)"><h3>' + esc(c.title) + ': What Next?</h3>';
+  let front = '';
+  p.stacks.forEach(function (s, i) {
+    const n = tagCount(s, c.act.tag) + c.tags.filter(function (t) { return t === c.act.tag; }).length;
+    front += '<button class="btn small" type="button" data-act="play" data-i="' + i + '">Front of ' + esc(CARDS[s[s.length - 1]].title) + ' (' + amountText(c.act, n) + ')</button>';
+  });
+  if (p.stacks.length < 5) front += '<button class="btn small" type="button" data-act="play" data-i="-1">Start a new stack (' + amountText(c.act, c.tags.filter(function (t) { return t === c.act.tag; }).length) + ')</button>';
+  h += '<div><span class="label">Play in front: covers that card’s action</span><div class="choices">' + front + '</div></div>';
+  let tuck = '';
+  p.stacks.forEach(function (s, i) {
+    const fa = CARDS[s[s.length - 1]].act;
+    const gain = c.tags.filter(function (t) { return t === fa.tag; }).length;
+    let lbl = esc(CARDS[s[s.length - 1]].title);
+    if (gain) lbl += ' (+' + gain + ' ' + TAGS[fa.tag][0] + ')';
+    tuck += '<button class="btn ghost small" type="button" data-act="tuck" data-i="' + i + '">' + lbl + '</button>';
+  });
+  h += '<div><span class="label">Tuck behind: adds its tags to that stack</span><div class="choices">' + tuck + '</div></div>';
+  let sup = '';
+  st.globals.forEach(function (g, gi) {
+    if (g.active || c.tags.indexOf(GLOBALS[g.id].tag) < 0) return;
+    sup += '<button class="btn ghost small" type="button" data-act="support" data-i="' + gi + '">' + esc(GLOBALS[g.id].title) + '</button>';
+  });
+  st.crises.forEach(function (cr, ci) {
+    if (!cr.face || c.tags.indexOf(CRISES[cr.id].ignore) < 0) return;
+    sup += '<button class="btn ghost small" type="button" data-act="ctuck" data-i="' + ci + '">Under ' + esc(CRISES[cr.id].title) + '</button>';
+  });
+  if (sup) h += '<div><span class="label">Support the world</span><div class="choices">' + sup + '</div></div>';
+  h += '<div><button class="btn ghost small" type="button" data-act="deselect">Cancel</button></div></div>';
+  return h;
+}
+function payHTML(st, me) {
+  const p = st.players[me];
+  const front = p.stacks[UI.pay.stack][p.stacks[UI.pay.stack].length - 1];
+  const act = CARDS[front].act;
+  let extra = '';
+  if (act.kind === 'res' && act.arg === 'any') {
+    extra += '<div class="choices"><span class="label">Resilience type</span>';
+    RES.forEach(function (r) { let on = ''; if (UI.pay.res === r) on = ' style="border-color:var(--ink)"'; extra += '<button class="btn ghost small" type="button" data-act="pay-res" data-r="' + r + '"' + on + '>' + RES_NAME[r] + '</button>'; });
+    extra += '</div>';
+  }
+  if (act.multi) {
+    extra += '<div class="choices"><span class="label">Help which bloc?</span>';
+    st.players.forEach(function (q, i) { if (i === me) return; let on = ''; if (UI.pay.to === i) on = ' style="border-color:var(--ink)"'; extra += '<button class="btn ghost small" type="button" data-act="pay-to" data-i="' + i + '"' + on + '>' + esc(BLOCS[q.bloc].name) + '</button>'; });
+    extra += '</div>';
+  }
+  let msg = 'Use ' + CARDS[front].title + '.';
+  if (act.cost) msg += ' Tap ' + plural(act.cost, 'card') + ' in your hand to discard (' + UI.payPick.length + ' of ' + act.cost + ' chosen).';
+  let ready = UI.payPick.length === act.cost;
+  if (act.multi && !(UI.pay.to >= 0)) ready = false;
+  let dis = ' disabled';
+  if (ready) dis = '';
+  return '<div class="prompt"><span>' + esc(msg) + '</span>' + extra + '<span class="choices"><button class="btn small green" type="button" data-act="pay-go"' + dis + '>Confirm</button><button class="btn ghost small" type="button" data-act="pay-cancel">Cancel</button></span></div>';
+}
+function blocHTML(st, me) {
+  const p = st.players[me];
+  const b = BLOCS[p.bloc];
+  const local = st.phase === 'local' && st.status === 'playing';
+  const acting = local && !p.done;
+  let doneBtn = '';
+  if (local) {
+    if (p.done) doneBtn = '<span class="chip good">Finished</span><button class="btn ghost small" type="button" data-act="undone">Keep Working</button>';
+    else doneBtn = '<button class="btn" type="button" data-act="done">Finish Local Stage</button>';
+    if (Net.kind === 'practice' && st.settings.coach && acting) doneBtn = '<button class="btn ghost small" type="button" data-act="hint">Hint</button>' + doneBtn;
+  }
+  let stacks = '';
+  p.stacks.forEach(function (s, i) { stacks += stackHTML(st, me, i, acting); });
+  let hand = '';
+  p.hand.forEach(function (id) {
+    let cls = '';
+    if (UI.sel === id) cls = 'sel';
+    if (UI.pay && UI.payPick.indexOf(id) >= 0) cls = 'pay';
+    hand += cardHTML(id, { button: acting, cls: cls });
+  });
+  if (!hand) hand = '<p class="note">Your hand is empty.</p>';
+  let mid = '';
+  if (UI.pay && acting) mid = payHTML(st, me);
+  else if (UI.sel >= 0 && acting) mid = selectedHTML(st, me);
+  else if (acting && UI.pending) mid = '<div class="prompt"><span>Sending your move to the host…</span></div>';
+  else if (acting) mid = '<div class="prompt"><span>Tap a card in your hand to play it, or use the actions on your stacks. Finish when you are happy.</span></div>';
+  let coach = '';
+  if (UI.coachText && acting) coach = '<aside class="coach"><span class="eyebrow">Coach</span><p>' + UI.coachText + '</p></aside>';
+  let who = esc(p.name);
+  if (Net.kind !== 'hotseat') who = 'You, ' + who;
+  return '<section class="bloc mine"><div class="bloc-head"><div><span class="eyebrow">' + who + '</span><h2 style="color:' + b.colour + '">' + esc(b.name) + '</h2></div><div class="choices">' + doneBtn + '</div></div>' +
+    '<div class="stats">' + energyHTML(p) + emisHTML(st, p) + resHTML(st, p) + cicHTML(p) + '</div>' +
+    '<div><span class="label">Play Area (' + p.stacks.length + ' of 5 stacks)</span><div class="stacks">' + stacks + '</div></div>' + mid + coach +
+    '<div><span class="label">Your Hand (public to the table)</span><div class="hand">' + hand + '</div></div></section>';
+}
+function otherHTML(st, i) {
+  const p = st.players[i];
+  const b = BLOCS[p.bloc];
+  let status = '';
+  if (st.phase === 'local') { if (p.done) status = '<span class="chip good">Finished</span>'; else status = '<span class="chip">Working</span>'; }
+  let fronts = p.stacks.map(function (s) { return esc(CARDS[s[s.length - 1]].title); }).join(', ');
+  let short = '';
+  if (shortfall(p)) short = ' <span class="warn-text">(' + shortfall(p) + ' short)</span>';
+  let tag = '';
+  if (p.kind === 'bot') tag = ' <span class="tag">Bot</span>';
+  return '<article class="other"><h3><i class="dot" style="background:' + b.colour + '"></i>' + esc(b.name) + '</h3><span class="note">' + esc(p.name) + tag + '</span>' + status +
+    '<div class="kv"><span>Carbon per round</span><b>' + carbonOf(st, p) + '</b></div><div class="kv"><span>Energy (dirty + clean / demand)</span><b>' + p.dirty + ' + ' + p.clean + ' / ' + p.demand + short + '</b></div>' +
+    '<div class="kv"><span>Resilience S / E / I</span><b>' + p.res.social + ' / ' + p.res.eco + ' / ' + p.res.infra + '</b></div><div class="kv"><span>Communities in Crisis</span><b>' + p.cic + '</b></div><div class="kv"><span>Cards in hand</span><b>' + p.hand.length + '</b></div><p class="note">Stacks: ' + fronts + '</p></article>';
+}
+function reportHTML(st, me) {
+  let lines = '';
+  st.report.forEach(function (r) { lines += '<li class="k-' + esc(r.k) + '">' + esc(r.txt) + '</li>'; });
+  let btn = '<button class="btn" type="button" data-act="continue">Start Round ' + (st.round + 1) + '</button>';
+  return '<section class="panel report" style="border-color:var(--sun)"><h2>Round ' + st.round + ' Report</h2><ol>' + lines + '</ol><div class="row">' + btn + '</div></section>';
+}
+function chartHTML(st) {
+  const h = st.history;
+  if (!h.length) return '';
+  const W = 520;
+  const H = 180;
+  let max = 10;
+  h.forEach(function (r) { max = Math.max(max, r.emitted, r.absorbed); });
+  const bw = (W - 60) / ROUNDS;
+  let svg = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Emitted and absorbed carbon by round">';
+  for (let g = 0; g <= 4; g++) { const y = 20 + (H - 50) * g / 4; svg += '<line x1="40" x2="' + (W - 10) + '" y1="' + y + '" y2="' + y + '" stroke="rgba(255,255,255,.08)"/><text x="34" y="' + (y + 4) + '" text-anchor="end" font-size="10" fill="#a9b2d4">' + Math.round(max * (1 - g / 4)) + '</text>'; }
+  h.forEach(function (r, i) {
+    const x = 46 + i * bw;
+    const he = (H - 50) * r.emitted / max;
+    const ha = (H - 50) * r.absorbed / max;
+    svg += '<rect x="' + x + '" y="' + (H - 30 - he) + '" width="' + (bw * 0.38) + '" height="' + he + '" rx="3" fill="#8b90a0"/>';
+    svg += '<rect x="' + (x + bw * 0.42) + '" y="' + (H - 30 - ha) + '" width="' + (bw * 0.38) + '" height="' + ha + '" rx="3" fill="#6fcf7f"/>';
+    svg += '<text x="' + (x + bw * 0.4) + '" y="' + (H - 14) + '" text-anchor="middle" font-size="11" fill="#a9b2d4">R' + r.round + '</text>';
+  });
+  svg += '</svg>';
+  return '<div><span class="label">Grey: emitted. Green: absorbed.</span>' + svg + '</div>';
+}
+function finalHTML(st) {
+  let title = 'The Planet Is Saved';
+  if (st.result !== 'win') title = 'The Climate Slipped Away';
+  let btn = '<button class="btn" type="button" data-act="again">Play Again</button>';
+  if (Net.mode === 'guest') btn = '<p class="muted">The host can start another game.</p>';
+  return '<section class="panel" style="border-color:var(--sun)"><span class="eyebrow">Round ' + st.round + ' · ' + degrees(st.therm.bands) + '°C</span><h2 style="font-size:34px">' + title + '</h2><p>' + esc(st.reason) + '</p>' + chartHTML(st) + '<div class="row">' + btn + '<button class="btn ghost" type="button" data-act="leave">Back To Menu</button></div></section>';
+}
+function logHTML(st) {
+  let items = '';
+  st.log.slice(-60).reverse().forEach(function (e) { items += '<li class="k-' + esc(e.k) + '">' + esc(e.txt) + '</li>'; });
+  return '<aside class="chron" aria-label="Chronicle"><h3>Chronicle</h3><ol>' + items + '</ol></aside>';
+}
+function renderGame() {
+  const st = S;
+  const me = mySeat();
+  let main = '';
+  if (st.status === 'over') main += finalHTML(st);
+  if (st.phase === 'report') main += reportHTML(st, me);
+  main += globalsHTML(st, me);
+  if (me >= 0) main += blocHTML(st, me);
+  let side = '';
+  st.players.forEach(function (p, i) { if (i !== me) side += otherHTML(st, i); });
+  side += logHTML(st);
+  $('#screen').innerHTML = dashHTML(st) + '<div class="mid">' + crisisHTML(st, me) + '</div><div class="game"><div class="board"><p class="stagebar">' + esc(stageText(st)) + '</p>' + main + '</div><div class="others">' + side + '</div></div>';
+}
+function stageText(st) {
+  if (st.status === 'over') return 'The game is over.';
+  if (st.phase === 'global') return 'Global stage: review the forecast crisis and choose a Global Project together.';
+  if (st.phase === 'local') {
+    const waiting = st.players.filter(function (p) { return !p.done; }).map(function (p) { return BLOCS[p.bloc].name; });
+    return 'Local stage: everyone plays at the same time. Still working: ' + waiting.join(', ') + '.';
+  }
+  if (st.phase === 'report') return 'Emissions, Crisis and Growth stages are resolved. Read the report, then start the next round.';
+  return '';
+}
+function renderCover() {
+  const c = $('#cover');
+  let show = false;
+  if (Net.kind === 'hotseat' && S && S.status === 'playing' && S.phase === 'local') {
+    const a = activeHotseat();
+    if (a !== UI.revealed && !S.players[a].done) show = true;
+  }
+  if (!show) { c.hidden = true; c.innerHTML = ''; return; }
+  const p = S.players[activeHotseat()];
+  c.hidden = false;
+  c.innerHTML = '<div class="sheet cover-card"><span class="eyebrow">Pass the screen</span><h2>' + esc(p.name) + '</h2><p>Your turn to lead the ' + esc(BLOCS[p.bloc].name) + ' in the Local stage.</p><button class="btn" type="button" data-act="reveal">I Am Ready</button></div>';
+}
+const RULES_HTML =
+  '<div class="sheet" role="dialog" aria-label="Rules"><button class="btn ghost small close" type="button" data-act="close-rules">Close</button>' +
+  '<h2>How To Play</h2><p>Common Sky is cooperative. Each player leads a world bloc. Together you must reach drawdown, where Trees, Oceans and air capture absorb more Carbon than the world emits, before the end of round 6.</p>' +
+  '<h3>Your Bloc</h3><ul><li><b>Energy:</b> Dirty plus Clean Energy must meet your Energy Demand, or the shortfall becomes Communities in Crisis.</li><li><b>Carbon:</b> every Dirty Energy and Emissions token emits 1 Carbon each round.</li><li><b>Resilience:</b> Social, Ecological and Infrastructure tokens reduce crisis effects on you. They are never spent.</li><li><b>Communities in Crisis:</b> at 4 you draw 1 fewer card, at 8 you draw 2 fewer, and at 12 everyone loses.</li></ul>' +
+  '<h3>Each Round</h3><ol><li><b>Global:</b> draw Crisis cards (more as it warms). One is forecast face up. Choose one of two Global Projects, or none. Up to 4 can be in play.</li><li><b>Local:</b> draw 5 cards, then everyone plays at once, in any order, as much as they like. Play a card in front of a stack (up to 5 stacks) to use its action, tuck it behind a stack to add its tags, tuck it under a Global Project to work towards it, or tuck it under the forecast crisis to stop it. Actions count the matching tags in their whole stack, and only the front card’s action can be used. Most actions work once per round; some cost cards from your hand. Unused cards stay in your hand.</li><li><b>Emissions:</b> check Energy Demand, then add up Carbon. Sinks absorb what they can. If they have spare capacity, you reach drawdown and pull Carbon back off the Thermometer. Otherwise the excess fills the Thermometer, and each full row adds a Temperature Band (0.1°C).</li><li><b>Crisis:</b> roll the planetary die once per band. Each roll advances a tipping-point track, and red spaces trigger their effect. Then resolve every Crisis card. A crisis is ignored if enough matching tags were tucked under it, and Resilience of the listed type reduces it for you.</li><li><b>Growth:</b> win if you reached drawdown this round. Otherwise each bloc’s Energy Demand grows.</li></ol>' +
+  '<h3>Losing</h3><p>The Thermometer reaches 2.0°C (8 bands), any bloc reaches 12 Communities in Crisis, or round 6 ends without drawdown.</p>' +
+  '<h3>Tips</h3><ul><li>Add Clean Energy before removing Dirty Energy, or you will fall short of demand.</li><li>Cut big emissions early: every Carbon saved counts in every later round.</li><li>Keep one Resilience of each type per Temperature Band.</li><li>Global Projects help everyone. Pool tags to finish them.</li></ul></div>';
+function openRules() { const r = $('#rules'); r.innerHTML = RULES_HTML; r.hidden = false; const b = r.querySelector('.close'); if (b) b.focus(); }
+function closeRules() { const r = $('#rules'); r.hidden = true; r.innerHTML = ''; }
+
+/* ---------- Input ---------- */
+
+function showHint() {
+  const me = mySeat();
+  const a = botLocal(S, me);
+  let t = '';
+  if (a.type === 'done') t = 'Nothing else is clearly worth doing this round. Finish the Local stage.';
+  else if (a.type === 'take') t = 'Use the action on <b>' + esc(CARDS[S.players[me].stacks[a.stack][S.players[me].stacks[a.stack].length - 1]].title) + '</b>.';
+  else if (a.type === 'play') { UI.sel = a.card; let where = 'a new stack'; if (a.stack >= 0) where = 'the front of ' + esc(CARDS[S.players[me].stacks[a.stack][S.players[me].stacks[a.stack].length - 1]].title); t = 'Play <b>' + esc(CARDS[a.card].title) + '</b> on ' + where + ', then use it.'; }
+  else if (a.type === 'tuck') { UI.sel = a.card; t = 'Tuck <b>' + esc(CARDS[a.card].title) + '</b> behind ' + esc(CARDS[S.players[me].stacks[a.stack][S.players[me].stacks[a.stack].length - 1]].title) + ' to boost it.'; }
+  else if (a.type === 'support') { UI.sel = a.card; t = 'Tuck <b>' + esc(CARDS[a.card].title) + '</b> under ' + esc(GLOBALS[S.globals[a.g].id].title) + '.'; }
+  else if (a.type === 'ctuck') { UI.sel = a.card; t = 'Tuck <b>' + esc(CARDS[a.card].title) + '</b> under the forecast crisis to help stop it.'; }
+  const p = S.players[me];
+  if (shortfall(p)) t += ' Watch out: you are ' + shortfall(p) + ' short of Energy Demand.';
+  UI.coachText = t;
+  render();
+}
+function copyInvite() {
+  let text = Net.code;
+  if (Net.transport && Net.transport.kind === 'peer' && /^https?:$/.test(location.protocol)) text = location.href.split('#')[0] + '#join-' + Net.code;
+  try {
+    navigator.clipboard.writeText(text).then(function () { toast('Copied: ' + text); }, function () { toast('Copy failed. The code is ' + Net.code + '.'); });
+  } catch (e) { toast('The code is ' + Net.code + '.'); }
+}
+function startTake(si) {
+  const me = mySeat();
+  const p = S.players[me];
+  const front = p.stacks[si][p.stacks[si].length - 1];
+  const act = CARDS[front].act;
+  UI.sel = -1;
+  if (act.cost === 0 && !act.multi && !(act.kind === 'res' && act.arg === 'any')) { dispatch({ type: 'take', seat: me, stack: si, pay: [] }); return; }
+  UI.pay = { stack: si, res: weakest(p), to: -1 };
+  UI.payPick = [];
+  render();
+}
+function handleAct(act, el) {
+  const me = mySeat();
+  if (act === 'practice-start') startPractice();
+  else if (act === 'hotseat-start') startHotseat();
+  else if (act === 'hs-add') { readHsNames(); if (UI.hsNames.length < 4) UI.hsNames.push('Delegate ' + (UI.hsNames.length + 1)); renderHsNames(); }
+  else if (act === 'hs-remove') { readHsNames(); if (UI.hsNames.length > 2) UI.hsNames.splice(Number(el.dataset.i), 1); renderHsNames(); }
+  else if (act === 'online-create') onlineCreate();
+  else if (act === 'online-join') onlineJoin();
+  else if (act === 'resume') onlineResume(el.dataset.code);
+  else if (act === 'rules') openRules();
+  else if (act === 'close-rules') closeRules();
+  else if (act === 'add-bot') applyAction({ type: 'addBot' }, false);
+  else if (act === 'remove-player') applyAction({ type: 'removePlayer', index: Number(el.dataset.i) }, false);
+  else if (act === 'start') applyAction({ type: 'start' }, false);
+  else if (act === 'again') applyAction({ type: 'again' }, false);
+  else if (act === 'copy-code') copyInvite();
+  else if (act === 'leave-ask') {
+    if (UI.confirmLeave) { leaveGame(); return; }
+    UI.confirmLeave = true;
+    renderTop();
+    setTimeout(function () { UI.confirmLeave = false; renderTop(); }, 3000);
+  }
+  else if (act === 'leave') leaveGame();
+  else if (act === 'pick-global') { const a = { type: 'pickGlobal', pick: Number(el.dataset.i), replace: UI.replace }; UI.replace = -1; dispatch(a); }
+  else if (act === 'replace') { UI.replace = Number(el.dataset.i); render(); }
+  else if (act === 'continue') dispatch({ type: 'continue' });
+  else if (act === 'done') { UI.sel = -1; UI.pay = null; UI.coachText = ''; dispatch({ type: 'done', seat: me, done: true }); }
+  else if (act === 'undone') dispatch({ type: 'done', seat: me, done: false });
+  else if (act === 'deselect') { UI.sel = -1; render(); }
+  else if (act === 'play' || act === 'tuck') { const card = UI.sel; UI.sel = -1; dispatch({ type: act, seat: me, card: card, stack: Number(el.dataset.i) }); }
+  else if (act === 'support') { const card = UI.sel; UI.sel = -1; dispatch({ type: 'support', seat: me, card: card, g: Number(el.dataset.i) }); }
+  else if (act === 'ctuck') { const card = UI.sel; UI.sel = -1; dispatch({ type: 'ctuck', seat: me, card: card, c: Number(el.dataset.i) }); }
+  else if (act === 'take') startTake(Number(el.dataset.i));
+  else if (act === 'pay-res') { UI.pay.res = el.dataset.r; render(); }
+  else if (act === 'pay-to') { UI.pay.to = Number(el.dataset.i); render(); }
+  else if (act === 'pay-cancel') { UI.pay = null; UI.payPick = []; render(); }
+  else if (act === 'pay-go') { const a = { type: 'take', seat: me, stack: UI.pay.stack, pay: UI.payPick.slice(), res: UI.pay.res, to: UI.pay.to }; UI.pay = null; UI.payPick = []; dispatch(a); }
+  else if (act === 'hint') showHint();
+  else if (act === 'reveal') { UI.revealed = activeHotseat(); render(); }
+}
+document.addEventListener('click', function (e) {
+  if (e.target.id === 'rules') { closeRules(); return; }
+  const el = e.target.closest('[data-act],[data-hand]');
+  if (!el || el.disabled) return;
+  if (el.dataset.hand !== undefined) {
+    const id = Number(el.dataset.hand);
+    if (UI.pay) {
+      const k = UI.payPick.indexOf(id);
+      const p = S.players[mySeat()];
+      const front = p.stacks[UI.pay.stack][p.stacks[UI.pay.stack].length - 1];
+      if (k >= 0) UI.payPick.splice(k, 1);
+      else if (UI.payPick.length < CARDS[front].act.cost) UI.payPick.push(id);
+      render();
+      return;
+    }
+    if (UI.sel === id) UI.sel = -1;
+    else UI.sel = id;
+    render();
+    return;
+  }
+  handleAct(el.dataset.act, el);
+});
+document.addEventListener('keydown', function (e) {
+  const tag = e.target && e.target.tagName;
+  if (e.key === 'Escape' && !$('#rules').hidden) { closeRules(); return; }
+  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') {
+    if (e.key === 'Enter' && e.target.id === 'on-code') onlineJoin();
+    return;
+  }
+  if (e.key === 'Escape' && (UI.sel >= 0 || UI.pay)) { UI.sel = -1; UI.pay = null; UI.payPick = []; render(); }
+});
+setInterval(function () {
+  if (UI.pending && Date.now() - UI.pending > 8000) { UI.pending = 0; UI.pendingN = 0; toast('No answer from the host yet. They may have lost their connection.', 'bad'); render(); }
+}, 500);
+
+window.__sky = { peek: function () { return { S: S, me: mySeat(), net: Net.mode, kind: Net.kind, sel: UI.sel, pay: UI.pay, pending: UI.pending }; }, setBotSpeed: function (s) { botSpeed = s; }, reduce: reduce, botLocal: botLocal, botGlobal: botGlobal, CARDS: CARDS, GLOBALS: GLOBALS };
+
+render();
+if (ONLINE.env === 'cloud-pending') initCloud();
+})();
+</script>
+</body>
+</html>
